@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="killer.silver">
+
+
+
+
+
+<title>宝宝巴士版个人博客搭建 | 𝓗𝓪𝓿𝓮 𝓪 𝓑𝓻𝓮𝓪𝓴</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+    <script type="text/javascript" src="/js/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" src="/js/sketch.min.js"></script>
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <script>
+        // heart mouse effect
+        !function(e, t, a) {
+    function r() {
+        for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+        requestAnimationFrame(r)
+    }
+    function n() {
+        var t = "function" == typeof e.onclick && e.onclick;
+        e.onclick = function(e) {
+            t && t(),
+                o(e)
+        }
+    }
+    function o(e) {
+        var a = t.createElement("div");
+        a.className = "heart",
+            s.push({
+                el: a,
+                x: e.clientX - 5,
+                y: e.clientY - 5,
+                scale: 1,
+                alpha: 1,
+                color: c()
+            }),
+            t.body.appendChild(a)
+    }
+    function i(e) {
+        var a = t.createElement("style");
+        a.type = "text/css";
+        try {
+            a.appendChild(t.createTextNode(e))
+        } catch(t) {
+            a.styleSheet.cssText = e
+        }
+        t.getElementsByTagName("head")[0].appendChild(a)
+    }
+    function c() {
+        return "rgb(" + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + ")"
+    }
+    var s = [];
+    e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame ||
+        function(e) {
+            setTimeout(e, 1e3 / 60)
+        },
+        i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"),
+        n(),
+        r()
+} (window, document);
+
+    </script>
+
+<script>
+    // ----------------------------------------
+		// Particle
+		// ----------------------------------------
+
+		function Particle(x, y, radius) {
+			this.init(x, y, radius);
+		}
+
+		Particle.prototype = {
+
+			init : function(x, y, radius) {
+
+				this.alive = true;
+
+				this.radius = radius || 10;
+				this.wander = 0.15;
+				this.theta = random(TWO_PI);
+				this.drag = 0.92;
+				this.color = '#fff';
+
+				this.x = x || 0.0;
+				this.y = y || 0.0;
+
+				this.vx = 0.0;
+				this.vy = 0.0;
+			},
+
+			move : function() {
+
+				this.x += this.vx;
+				this.y += this.vy;
+
+				this.vx *= this.drag;
+				this.vy *= this.drag;
+
+				this.theta += random(-0.5, 0.5) * this.wander;
+				this.vx += sin(this.theta) * 0.1;
+				this.vy += cos(this.theta) * 0.1;
+
+				this.radius *= 0.96;
+				this.alive = this.radius > 0.5;
+			},
+
+			draw : function(ctx) {
+
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
+				ctx.fillStyle = this.color;
+				ctx.fill();
+			}
+		};
+
+		// ----------------------------------------
+		// Example
+		// ----------------------------------------
+
+		var MAX_PARTICLES = 100;
+		var COLOURS = [ '#69D2E7', '#A7DBD8', '#E0E4CC', '#F38630', '#FA6900',
+				'#FF4E50', '#F9D423' ];
+
+		var particles = [];
+		var pool = [];
+		var demo = Sketch.create({
+			container : document.getElementsByTagName("body")[0]
+		});
+
+		demo.setup = function() {
+
+			// Set off some initial particles.
+			var i, x, y;
+
+			//  for ( i = 0; i < 20; i++ ) {
+			x = (demo.width * 0.5) + random(-100, 100);
+			y = (demo.height * 0.5) + random(-100, 100);
+			demo.spawn(0, 999);
+			// }
+		};
+
+		demo.spawn = function(x, y) {
+
+			if (particles.length >= MAX_PARTICLES)
+				pool.push(particles.shift());
+
+			particle = pool.length ? pool.pop() : new Particle();
+			particle.init(x, y, random(5, 20));
+
+			particle.wander = random(0.5, 2.0);
+			particle.color = random(COLOURS);
+			particle.drag = random(0.9, 0.99);
+
+			theta = random(TWO_PI);
+			force = random(2, 8);
+
+			particle.vx = sin(theta) * force;
+			particle.vy = cos(theta) * force;
+
+			particles.push(particle);
+		};
+
+		demo.update = function() {
+
+			var i, particle;
+
+			for (i = particles.length - 1; i >= 0; i--) {
+
+				particle = particles[i];
+
+				if (particle.alive)
+					particle.move();
+				else
+					pool.push(particles.splice(i, 1)[0]);
+			}
+		};
+
+		demo.draw = function() {
+
+			demo.globalCompositeOperation = 'lighter';
+
+			for ( var i = particles.length - 1; i >= 0; i--) {
+				particles[i].draw(demo);
+			}
+		};
+
+		demo.mousemove = function() {
+
+			var particle, theta, force, touch, max, i, j, n;
+
+			for (i = 0, n = demo.touches.length; i < n; i++) {
+
+				touch = demo.touches[i], max = random(1, 4);
+				for (j = 0; j < max; j++) {
+					demo.spawn(touch.x, touch.y);
+				}
+
+			}
+		};
+</script>
+<script>
+	document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener('copy', (e) => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+		var copyrightStr = "\n\n\n-------------------------------------------------\nhey朋友，欢迎转载我的文章~\n转载文章请注明出处：killersilver9527.github.io\n版权所有© 2024 killer.silver，保留所有权利\n-------------------------------------------------"
+      e.clipboardData.setData('text/plain', selection.toString() + copyrightStr);
+      e.preventDefault();
+    }
+  });
+});
+</script>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/"></a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/">首页</a>
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">目录</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                    <a class="menu-item" href="/friend">友链</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/"></a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/">首页</a>
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">目录</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                    <a class="menu-item" href="/friend">友链</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">◕‿◕ 展开</a>
+        <a onclick="go_top()">▲ 去到顶部</a>
+        <!-- <a onclick="go_bottom()">▼ 去到底部</a> -->
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "-‿- 折叠"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "◕‿◕ 展开"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">宝宝巴士版个人博客搭建</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        <!-- Date: <a href="#">2024-04-18&nbsp;&nbsp;15:07:04</a> -->
+                        发布时间: <a href="#">2024-04-18&nbsp;&nbsp;</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    文章目录:
+                            
+                                <a href="/categories/%E5%B8%83%E8%A1%A3%E5%85%AC%E4%B8%BB%E7%9A%84%E6%9D%82%E8%B4%A7%E9%93%BA/">布衣公主的杂货铺</a>
+                            
+                                <a href="/categories/%E5%B8%83%E8%A1%A3%E5%85%AC%E4%B8%BB%E7%9A%84%E6%9D%82%E8%B4%A7%E9%93%BA/%E5%AE%9D%E5%AE%9D%E6%88%91%E5%91%80%E8%A6%81%E6%89%8B%E6%8A%8A%E6%89%8B%E6%95%99/">宝宝我呀要手把手教</a>
+                            
+                        </span>
+                    
+
+                    
+                        <span class="post-time">
+                        <br>文章总字数: 13.3k&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
+                        <span class="post-time">
+                            建议阅读时长: 52min&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
+                    
+
+                    
+                        <span id="busuanzi_container_page_pv">
+                        文章阅读量: <span id="busuanzi_value_page_pv"></span>&nbsp;&nbsp;
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <style>
+    audio::-webkit-media-controls-enclosure{
+        background-color: transparent;
+    }
+    audio::-webkit-media-controls-panel{
+        background-image: url("/image/posts/post1/extend/audioplayer.gif");
+        background-color: white;
+    }
+    .guide_img {
+        border: 3px dashed #96d9d8;
+        border-radius: 10px;
+        /*box-shadow:5px 5px 10px #96d9d8;*/
+    }
+</style>
+
+<audio controls autoplay loop>
+  <source src="/image/posts/post1/extend/岑宁儿-勿念.mp3" type="audio/mpeg">
+</audio>
+
+
+<p>早有建立自己博客站的想法，但奈何拖延症已是晚期，懒惰人士终于在今年，选择了最简单快捷的 Hexo + Github 的方式，把这个心结给圆满了</p>
+<p>考虑到本人极其有限的前端代码水平，以及不堪重负的海马体，所以秉承学过就忘为大脑减负的宗旨，第一篇文章就决定记录此次的搭建过程了，同时也方便未来有需要可以随时查看</p>
+<h2 id="部署和配置"><a href="#部署和配置" class="headerlink" title="部署和配置"></a>部署和配置</h2><p>该章节讲解最基本的部署和配置，即使用默认提供的效果，将静态网页公开到互联网</p>
+<p>章节中默认使用Windows系统操作，该部分内容参考自B站Up主DID迪<sup><a id="link1" href="#ref1">-1-</a></sup>的搭建教程</p>
+<h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><ul>
+<li><p>准备Github账号</p>
+<p>无需多言，直接在<a target="_blank" rel="noopener" href="https://github.com/">Github官网</a>注册即可</p>
+</li>
+<li><p>安装Git</p>
+<p>从<a target="_blank" rel="noopener" href="https://git-scm.com/downloads">Git官网下载页</a>中选择（无版本要求，但建议不要选择太老的版本）下载，按照默认设置直接安装即可</p>
+<p>注意：Git可以更改安装文件夹的位置，不会影响最终使用</p>
+<p>安装完成后，可以任意选择以下方式检查是否安装成功：</p>
+<p>1）在开始菜单里找到Git Bash，点击后弹出命令窗口，则说明安装成功</p>
+<p>  <img class="guide_img" src="/image/posts/post1/1.png" alt="开始菜单找到Git Bash" width=50%><br></p>
+  <img class="guide_img" src="/image/posts/post1/2.png" alt="弹出命令窗口" width=50%>
+
+<p>2）在任意文件夹（或桌面）右键，可以看到Git选项，点击Open Git Bash Here后会弹出命令窗口，则说明安装成功</p>
+<p> <img class="guide_img" src="/image/posts/post1/3.png" alt="右键菜单" width=50%><br></p>
+<img class="guide_img" src="/image/posts/post1/4.png" alt="弹出命令窗口" width=50%>
+</li>
+<li><p>安装Node.js</p>
+<p>从<a target="_blank" rel="noopener" href="https://nodejs.org/en/download/">Node.js官网下载页</a>中选择（无版本要求，但建议不要选择太老的版本）下载，按照默认设置安装即可</p>
+<p>注意：Node.js需要配置环境变量，<strong>建议按照原始路径安装</strong>防止出错</p>
+<p>安装完成后，在Git命令界面中输入指令检查是否安装成功（有输出对应的版本号即成功）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git version</span><br><span class="line">node -v</span><br><span class="line">npm -v</span><br></pre></td></tr></table></figure>
+
+<img class="guide_img" src="/image/posts/post1/5.png" alt="输入命令检查安装版本" width=60%>
+</li>
+<li><p>安装Hexo</p>
+<p>前提需要Git和Node.js安装成功，然后在Git命令界面输入以下指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+
+<p>请耐心等待一段时间，当出现安装完成的输出信息之后才算成功，信息提示类似下图：</p>
+<img class="guide_img" src="/image/posts/post1/6.png" alt="安装成功提示" width=60%></li>
+</ul>
+<p>将以上所有必须的准备工作完成后，就可以进行后续的操作了</p>
+<h3 id="Hexo配置"><a href="#Hexo配置" class="headerlink" title="Hexo配置"></a>Hexo配置</h3><ul>
+<li><p>安装必要的部署插件</p>
+<p>要将静态网页部署到Github上，需要安装部署插件hexo-deployer-git，以便使用指令将本地文件上传</p>
+<p>在Git命令界面输入以下指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>请耐心等待一段时间，当出现安装完成的输出信息之后才算成功</p>
+</li>
+<li><p>新建文件</p>
+<p>选择一个文件夹，在该文件夹下右键打开Git Bash，依次执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init myBlog</span><br><span class="line">cd myBlog</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+
+<p>注意：这里是生成一个名叫myBlog（名字可自定义）的文件夹</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;该文件夹即是博客网站所有文件的总文件夹</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在没有特别需求的情况下，建议不移动该文件夹位置</p>
+</li>
+<li><p>检查是否成功</p>
+<p>在前面的操作均无误，没有报错的情况下，执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></table></figure>
+
+<p>然后在浏览器中开启本地网址 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000</a> 即可预览效果</p>
+<p>预览效果为默认的界面，并且包含一篇默认的Hello World博文</p>
+<img class="guide_img" src="/image/posts/post1/7.png" alt="界面预览" width=80%>
+</li>
+<li><p>Hexo常用指令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hexo g 						# 生成页面数据</span><br><span class="line">hexo s						# 开启本地服务器</span><br><span class="line">hexo d 						# 部署到Github上</span><br><span class="line">hexo new &quot;文章题目&quot;			  	# 新建文章</span><br></pre></td></tr></table></figure>
+
+<p><strong>g生成指令</strong>：</p>
+<p>​    1）在关闭本地服务器的情况下做出了修改，重新开启时都应该重新生成一下</p>
+<p>​     2）在本地文件部署到Github服务器之前，都应该先生成一下</p>
+<p><strong>s开启本地服务器指令</strong>：</p>
+<p>​    在部署到Github服务器之前，想要预览效果都可以开启本地服务器之后在 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000</a> 完成</p>
+<p>​    注意：此时效果仅在本地可见，且此时命令界面中使用Ctrl + C结束服务</p>
+<p><strong>d部署到Github指令</strong>：</p>
+<p>​    使用该指令可以将本地已经编译完成的文件上传到Github仓库</p>
+<p>​    注意：此时效果全网可见</p>
+<p>​    注意：需要绑定SSH key才可以正常使用，部署见【- Github部署 -】章节</p>
+</li>
+<li><p>Hexo默认文件夹</p>
+<p>Hexo生成的默认文件夹结构如下图所示：</p>
+<img class="guide_img" src="/image/posts/post1/8.png" alt="文件夹结构" width=35%>
+
+<p>public：包含了经过g生成指令编译完成后文件结构，最终上传到Github上的也是该文件夹</p>
+<p>source：使用到的源文件，其中使用new指令生成的.md文件也在这里面（_post文件夹）</p>
+<p>themes：包含需要使用到的主题文件，主题设置见【- 自定义修改 -】章节</p>
+<p>node_modules：包含需要的支持库文件，使用npm安装的包基本都在这里</p>
+<p>public&#x2F;Images：包含了所有本地图片的文件夹，使用时需要注意其路径为‘ &#x2F;theme&#x2F;xxx ’</p>
+</li>
+<li><p>配置文件</p>
+<p>在文件夹下有一个_config.yml文件，这是一个默认的配置文件，可以配置一些基础信息</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里挑选一些常用需要修改的配置项进行说明</span></span><br><span class="line"><span class="attr">title:</span> 					<span class="comment"># 这里配置站点标题，最终显示到浏览器标签页上</span></span><br><span class="line"><span class="attr">subtitle:</span> 				<span class="comment"># 站点副标题</span></span><br><span class="line"><span class="attr">description:</span> 				<span class="comment"># 站点描述</span></span><br><span class="line"><span class="attr">author:</span> 				<span class="comment"># 作者名（最主要用于显示在底部Copyright栏）</span></span><br><span class="line"><span class="attr">url:</span> 					<span class="comment"># 本站点链接</span></span><br><span class="line"></span><br><span class="line"><span class="attr">theme:</span>					<span class="comment"># 用于配置自定义主题（详见【自定义修改】章节）</span></span><br><span class="line"><span class="attr">deploy:</span>					<span class="comment"># 用于绑定部署信息（详见【Github部署】章节）</span></span><br></pre></td></tr></table></figure>
+
+<p>对配置文件进行一些修改之后，可以在 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000</a> 中看到修改后的效果</p>
+</li>
+</ul>
+<h3 id="Github部署"><a href="#Github部署" class="headerlink" title="Github部署"></a>Github部署</h3><ul>
+<li><p>新建仓库</p>
+<p>注意：这里的仓库名必须是：github用户名.github.io</p>
+<p>注意：Github仅能使用一个同名仓库的代码托管一个静态站点</p>
+<img class="guide_img" src="/image/posts/post1/9.png" alt="新建仓库" width=65%>
+</li>
+<li><p>Git绑定Github账号</p>
+<p>在Git命令界面依次执行以下指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;YourName&quot;</span><br><span class="line">git config --global user.email &quot;email@example.com&quot;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">其中YourName和email@example.com替换成注册的账户名和邮箱</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置SSH key</p>
+<p>已经绑定了Github账号之后，在Git命令界面依次执行以下指令生成SSH key：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;绑定时使用的邮箱&quot;</span><br></pre></td></tr></table></figure>
+
+<p>使用以下指令查看生成的SSH key：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
+
+<p>首次使用还须确认并添加主机到本机SSH可信列表，要经过一定的信息验证</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p>注意：安全起见，生成的SSH key密钥应该保密</p>
+</li>
+<li><p>绑定SSH key</p>
+<p>登录Github添加刚生成的SSH key，从命令行中复制信息时注意快捷键是Ctrl + Ins</p>
+<p>在Github页面中点击 头像 → settings → SSH and GPG keys</p>
+<p>新建一个SSH key，将生成的key复制过来粘贴进去，确定建立即可</p>
+<p><img class="guide_img" src="/image/posts/post1/10.png" alt="新建密钥" width=80%><br></p>
+<img class="guide_img" src="/image/posts/post1/11.png" alt="新建密钥" width=60%>
+</li>
+<li><p>配置到根目录_config.yml文件中</p>
+<p>还需要进行最后一项配置，即在根目录中配置部署地址</p>
+<img class="guide_img" src="/image/posts/post1/12.png" alt="Github上信息" width=50%>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">	<span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">	<span class="attr">repo:</span> <span class="string">https://github.com/username/username.github.io.git</span>	<span class="comment"># 使用HTTPS对应地址</span></span><br><span class="line">	<span class="attr">branch:</span> <span class="string">main</span>	<span class="comment"># 使用对应分支，如果没有更改的话一般为main</span></span><br></pre></td></tr></table></figure>
+
+<p>保存配置即可</p>
+</li>
+<li><p>上传文件</p>
+<p>在Git命令界面依次执行以下指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g 		# 先生成</span><br><span class="line">hexo d 		# 部署到Github上</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>部署完成后，就可以在浏览器中通过 Github用户名.github.io 访问到网站了</p>
+<h2 id="自定义修改"><a href="#自定义修改" class="headerlink" title="自定义修改"></a>自定义修改</h2><p>默认的博客主题Landscape不够个性化，可以到<a target="_blank" rel="noopener" href="https://hexo.io/themes/">Hexo官网主题页</a>中获取心仪的主题</p>
+<p>需要注意的是，大多数主题的文件结构基本大同小异，但小部分主题可能会因为设计者的习惯差异，而出现文件结构有较大差别的情况</p>
+<p>我这里采用的是极简风的<a target="_blank" rel="noopener" href="https://github.com/Siricee/hexo-theme-Chic">Chic</a>主题，其主题文件结构简单清晰，更方便了后续自定义魔改</p>
+<p>当然，需要明白的一点是：不管主题文件怎么写，最终呈现形式为网页，在解析编译之后都逃不出html、css和js，所以根据这一原则去分析主题结构，便不会存在太大困难了</p>
+<h3 id="配置主题文件"><a href="#配置主题文件" class="headerlink" title="配置主题文件"></a>配置主题文件</h3><ul>
+<li><p>下载文件，解压缩之后放置到themes文件夹下</p>
+</li>
+<li><p>配置到根目录_config.yml文件中</p>
+<p>首先需要在根目录的_config.yml文件中链接主题文件路径，方便数据读取解析</p>
+<p>注意：这里要填写主题文件夹的名字</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">theme:</span> <span class="string">文件名</span></span><br></pre></td></tr></table></figure>
+
+<p>修改好之后，依次执行命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure>
+
+<p>在本地服务器 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000</a> 中就能看到更换主题后的效果了</p>
+</li>
+<li><p>修改主题配置</p>
+<p>主题文件夹下同样有_config.yml配置文件</p>
+<p>增加了主题文件之后，主题文件夹下的_config.yml配置文件会更加常用</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里挑选一些常用需要修改的配置项进行说明</span></span><br><span class="line"><span class="attr">navname:</span> <span class="comment"># Header主页面标题</span></span><br><span class="line"><span class="comment"># 导航栏标题（可以修改为中文，例如 → 归档: /archives）</span></span><br><span class="line"><span class="attr">nav:</span></span><br><span class="line"><span class="attr">Posts:</span> <span class="string">/archives</span></span><br><span class="line"><span class="attr">Categories:</span> <span class="string">/category</span></span><br><span class="line"><span class="attr">Tags:</span> <span class="string">/tag</span></span><br><span class="line"><span class="attr">About:</span> <span class="string">/about</span></span><br><span class="line"></span><br><span class="line"><span class="attr">favicon:</span> <span class="string">/favicon.ico</span>		<span class="comment"># 网站图标</span></span><br><span class="line"><span class="attr">nickname:</span> <span class="string">Jeremy</span> <span class="string">Bentham</span>	<span class="comment"># 主页中间显示名字</span></span><br><span class="line"><span class="comment"># 个人描述，可以修改成自己要显示的句子</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">Lorem</span> <span class="string">ipsum</span> <span class="string">dolor</span> <span class="string">sit</span> <span class="string">amet,</span> <span class="string">**consectetur</span> <span class="string">adipiscing</span> <span class="string">elit.**</span></span><br><span class="line"><span class="string">&lt;br&gt;Fusce</span> <span class="string">eget</span> <span class="string">urna</span> <span class="string">vitae</span> <span class="string">velit</span> <span class="string">*eleifend</span> <span class="string">interdum</span> <span class="string">at</span> <span class="string">ac*</span> <span class="string">nisi.</span></span><br><span class="line"><span class="comment"># 个人头像图片</span></span><br><span class="line"><span class="attr">avatar:</span> <span class="string">/image/avatar.jpeg</span></span><br><span class="line"><span class="comment"># 下方超链接，根据需要配置即可</span></span><br><span class="line"><span class="attr">links:</span></span><br><span class="line"><span class="attr">Blog:</span> <span class="string">/archives</span></span><br><span class="line"><span class="comment"># Category:</span></span><br><span class="line"><span class="attr">ZhiHu:</span> <span class="string">https://www.zhihu.com/people/sirice</span></span><br><span class="line"><span class="comment"># LinkedIn:</span></span><br><span class="line"><span class="comment"># FaceBook:</span></span><br><span class="line"><span class="comment"># Twitter:</span></span><br><span class="line"><span class="comment"># Skype:</span></span><br><span class="line"><span class="attr">Instagram:</span></span><br><span class="line"><span class="attr">Reddit:</span></span><br><span class="line"><span class="attr">Github:</span> <span class="string">https://github.com/Siricee</span>	</span><br><span class="line"><span class="comment"># 链接显示形式：图标 or 文字</span></span><br><span class="line"><span class="attr">links_text_enable:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">links_icon_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="comment"># 文章信息配置-是否显示作者、是否显示时间、是否显示目录</span></span><br><span class="line"><span class="attr">post_meta_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_author_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_date_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_category_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="comment"># 文章版权信息配置-是否显示作者、是否显示永久链接、是否显示许可证、是否显示寄语/口号</span></span><br><span class="line"><span class="attr">post_copyright_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_copyright_author_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_copyright_permalink_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_copyright_license_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_copyright_license_text:</span> <span class="string">Copyright</span> <span class="string">(c)</span> <span class="number">2019</span> <span class="string">&lt;a</span></span><br><span class="line"><span class="string">href=&quot;http://creativecommons.org/licenses/by-nc/4.0/&quot;&gt;CC-BY-NC-4.0&lt;/a&gt;</span></span><br><span class="line"><span class="string">LICENSE</span></span><br><span class="line"><span class="attr">post_copyright_slogan_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">post_copyright_slogan_text:</span> <span class="string">Do</span> <span class="string">you</span> <span class="string">believe</span> <span class="string">in</span> <span class="string">&lt;strong&gt;DESTINY&lt;/strong&gt;?</span></span><br><span class="line"><span class="comment"># 是否开启totop工具、是否开启页面标题</span></span><br><span class="line"><span class="attr">post_toc_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">page_title_enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="comment"># 时间格式</span></span><br><span class="line"><span class="attr">date_format:</span> <span class="string">MMMM</span> <span class="string">D,</span> <span class="string">YYYY</span></span><br><span class="line"><span class="attr">time_format:</span> <span class="string">H:mm:ss</span></span><br><span class="line"><span class="comment"># 引入样式表</span></span><br><span class="line"><span class="attr">stylesheets:</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">/css/style.css</span></span><br><span class="line"><span class="comment"># 引入js</span></span><br><span class="line"><span class="attr">scripts:</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">/js/script.js</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">/js/tocbot.min.js</span></span><br></pre></td></tr></table></figure>
+
+<img class="guide_img" src="/image/posts/post1/13.png" alt="页面对应信息" width=98%>
+</li>
+<li><p>新建页面，以及页面关联</p>
+<p>当前情况下，在点击目录页、标签页、关于页时均无效，所以需要对页面进行生成</p>
+<p>在Git命令界面执行以下指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page 页面名</span><br></pre></td></tr></table></figure>
+
+<p>该指令可以生成对应的页面，例如生成tag页面</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page tag</span><br></pre></td></tr></table></figure>
+
+<p>此时会自动在source文件夹下生成tag文件夹，内部有一个index.md文件</p>
+<p>开启该文件，其中会有一个默认的标题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">title: Tag</span><br><span class="line">date: YYYY-MM-DD HH:MM:SS</span><br></pre></td></tr></table></figure>
+
+<p>其中该标题可以修改为中文，不会影响使用</p>
+<p>需要注意的是，此时该文件就是一个正常的.md文件，与撰写博文的文件完全一致</p>
+<p>即你在这个.md文件中写的东西会直接作为内容显示到网页中</p>
+<p>一般的主题都会给Tag页和Category页添加对应的脚本和样式，所以需要在这两个对应的index.md文件中添加layout配置（注意使用小写），意思是读取主题文件夹中layout对应的脚本，这样就能显示主题文件中已经制作好的页面样式了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">title: Tag</span><br><span class="line">layout: tag</span><br><span class="line">date: YYYY-MM-DD HH:MM:SS</span><br></pre></td></tr></table></figure>
+
+<p>当然，Chic的About页，以及所有在主题配置文件中自定义并new出来的标签页，并没有提供样式</p>
+<p>对于这些页面的美化，提供两种思路以供参考：</p>
+<p>1）页面都有默认的index.md文件，而.md文件虽然不能完全等同于.html文件，但其兼容html的用法，所以可以直接使用.md文件进行页面编辑。此时的页面很多设置都是使用主题默认的，需要个性化的时候就要自己加入一些html的语言，包括定义页面、引入css、引入js等，具体可参考【- md引入JS和CSS自定义页面 -】章节</p>
+<p>2）根据主题文件的思路，在主题layout文件夹中新建对应的样式脚本，在对应的index.md文件中配置layout项的索引即可，具体操作可参考【- 页面定制 -】章节</p>
+</li>
+</ul>
+<h3 id="主题魔改"><a href="#主题魔改" class="headerlink" title="主题魔改"></a>主题魔改</h3><p>由于使用的主题是极简风格的，总体来说还是比较素，所以想要加入一些个性化的设计</p>
+<p>Hexo主题美化的插件在网络上一搜一大把，有需要的可以按照具体需求搜索</p>
+<p>比如加入Live2d看板娘、加入评论区、加入音乐播放器等功能</p>
+<p>文章这里与极简风格一脉相承，尽量保证简单美观，仅保留必须的效果（ʅ(‾◡◝)ʃ  绝对不是因为懒！）</p>
+<h4 id="数据统计"><a href="#数据统计" class="headerlink" title="数据统计"></a>数据统计</h4><p>在数据统计方面，我仅需要对文章阅读量以及文章字数进行统计的功能</p>
+<ul>
+<li><p>文章字数统计：Hexo-WordCount插件<sup><a id="link2" href="#ref2">-2-</a></sup></p>
+<p>在Git命令界面执行插件安装指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i hexo-wordcount --save</span><br></pre></td></tr></table></figure>
+
+<p>安装好之后即可直接使用，在需要显示的部分添加对应代码即可</p>
+<p>在Chic主题中，我需要统计每篇文章的字数，以及根据字数推荐阅读时长</p>
+<p>所以将代码加入到主题文件夹下&#x2F;layout&#x2F;_page&#x2F;post.ejs文件中需要的位置</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;% <span class="keyword">if</span>(theme.<span class="property">post_wordcount_enable</span>)&#123; %&gt;</span><br><span class="line">	<span class="language-xml"><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;post-time&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	文章总字数: &lt;%=wordcount(post.content) %&gt;</span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line">	<span class="language-xml"><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;post-time&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	建议阅读时长: &lt;%= min2read(post.content) %&gt;min</span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line">&lt;% &#125; %&gt;</span><br></pre></td></tr></table></figure>
+
+<p>注意：其中theme.post_wordcount_enable是我单独加的判断项，需要将post_wordcount_enable项配置到主题的_config.yml文件中，如果不需要这种判断，则直接去掉&lt;% %&gt;的内容即可</p>
+<p>（这里为了偷懒，直接使用了post-time（发布时间）的显示样式，不偷懒的话则应该重新命名一个class，并到对应的.styl文件中定义样式）</p>
+<p>该插件还有其他功能可供使用，详情请移步该插件官网，这里就不再赘述</p>
+</li>
+<li><p>文章阅读量统计：不蒜子<sup><a id="link3" href="#ref3">-3-</a></sup></p>
+<p>不蒜子提供两大类统计：站点总访问量的统计和单页面访问量的统计</p>
+<p>必须的操作是引入busuanzi.js，需要在主题文件夹下的 &#x2F;layout&#x2F;_partial&#x2F;footer.ejs中进行引入</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">async</span> <span class="attr">src</span>=<span class="string">&quot;//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>之后就可以根据需要对其进行使用了，我这里仅需要统计单篇文章的访问量，所以同样加入到主题文件夹下&#x2F;layout&#x2F;_page&#x2F;post.ejs文件中需要的位置</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;% <span class="keyword">if</span>(theme.<span class="property">post_readtime_enable</span>)&#123; %&gt;</span><br><span class="line">	<span class="language-xml"><span class="tag">&lt;<span class="name">span</span> <span class="attr">id</span>=<span class="string">&quot;busuanzi_container_page_pv&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	文章阅读量: <span class="tag">&lt;<span class="name">span</span> <span class="attr">id</span>=<span class="string">&quot;busuanzi_value_page_pv&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line">&lt;% &#125; %&gt;</span><br></pre></td></tr></table></figure>
+
+<p>注意：其中theme.post_readtime_enable也是我单独加的判断项，需要将post_readtime_enable项配置到主题的_config.yml文件中，如果不需要这种判断，则直接去掉&lt;% %&gt;的内容即可</p>
+<p>当然，如果想实现统计全站信息的功能，将代码加入到 &#x2F;layout&#x2F;_partial&#x2F;footer.ejs中最好，具体写法请移步官方文档，其中包含两种统计方式，自行选择需要的方式即可</p>
+</li>
+</ul>
+<h4 id="版权所有"><a href="#版权所有" class="headerlink" title="版权所有"></a>版权所有</h4><p>鉴于本博客所有文章均由本人编写，所以有加入版权信息声明的需求</p>
+<p>在主题的_config.yml配置中有对文章所有权的声明配置，但是没有提供复制页面内容时自动增加版权信息的功能</p>
+<p>所以需要手动加入该功能，该功能代码由chatgpt友情提供，将之直接加入到主题文件夹下&#x2F;layout&#x2F;layout.ejs中即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line"><span class="variable language_">document</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;DOMContentLoaded&#x27;</span>, <span class="function">(<span class="params">event</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="variable language_">document</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;copy&#x27;</span>, <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    	<span class="keyword">const</span> selection = <span class="variable language_">window</span>.<span class="title function_">getSelection</span>();</span><br><span class="line">    	<span class="keyword">if</span> (selection.<span class="property">rangeCount</span> &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        	<span class="keyword">var</span> copyrightStr = <span class="string">&quot;\n\n在这里要加入的版权信息&quot;</span></span><br><span class="line">        	e.<span class="property">clipboardData</span>.<span class="title function_">setData</span>(<span class="string">&#x27;text/plain&#x27;</span>, selection.<span class="title function_">toString</span>() + copyrightStr);</span><br><span class="line">        	e.<span class="title function_">preventDefault</span>();</span><br><span class="line">    	&#125;</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="特效加入"><a href="#特效加入" class="headerlink" title="特效加入"></a>特效加入</h4><p>由于Chic为极简风格，但是对于我来说有点太素了，所以想要加一些特效到页面中</p>
+<p>选定了两种效果：一种是鼠标点击出♥的效果，一种是部分区域鼠标滑动气泡跟随特效</p>
+<ul>
+<li><p>鼠标点击特效<sup><a id="link4" href="#ref4">-4-</a></sup></p>
+<p>鼠标点击特效是全局特效，所以需要将代码直接加入到主题文件夹下&#x2F;layout&#x2F;layout.ejs中</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//鼠标点击爱心</span></span><br><span class="line">!<span class="keyword">function</span>(<span class="params">e, t, a</span>) &#123;</span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">r</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> e = <span class="number">0</span>; e &lt; s.<span class="property">length</span>; e++) s[e].<span class="property">alpha</span> &lt;= <span class="number">0</span> ? (t.<span class="property">body</span>.<span class="title function_">removeChild</span>(s[e].<span class="property">el</span>), s.<span class="title function_">splice</span>(e, <span class="number">1</span>)) : (s[e].<span class="property">y</span>--, s[e].<span class="property">scale</span> += <span class="number">.004</span>, s[e].<span class="property">alpha</span> -= <span class="number">.013</span>, s[e].<span class="property">el</span>.<span class="property">style</span>.<span class="property">cssText</span> = <span class="string">&quot;left:&quot;</span> + s[e].<span class="property">x</span> + <span class="string">&quot;px;top:&quot;</span> + s[e].<span class="property">y</span> + <span class="string">&quot;px;opacity:&quot;</span> + s[e].<span class="property">alpha</span> + <span class="string">&quot;;transform:scale(&quot;</span> + s[e].<span class="property">scale</span> + <span class="string">&quot;,&quot;</span> + s[e].<span class="property">scale</span> + <span class="string">&quot;) rotate(45deg);background:&quot;</span> + s[e].<span class="property">color</span> + <span class="string">&quot;;z-index:99999&quot;</span>);</span><br><span class="line">        <span class="title function_">requestAnimationFrame</span>(r)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">n</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">var</span> t = <span class="string">&quot;function&quot;</span> == <span class="keyword">typeof</span> e.<span class="property">onclick</span> &amp;&amp; e.<span class="property">onclick</span>;</span><br><span class="line">        e.<span class="property">onclick</span> = <span class="keyword">function</span>(<span class="params">e</span>) &#123;</span><br><span class="line">            t &amp;&amp; <span class="title function_">t</span>(),</span><br><span class="line">                <span class="title function_">o</span>(e)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">o</span>(<span class="params">e</span>) &#123;</span><br><span class="line">        <span class="keyword">var</span> a = t.<span class="title function_">createElement</span>(<span class="string">&quot;div&quot;</span>);</span><br><span class="line">        a.<span class="property">className</span> = <span class="string">&quot;heart&quot;</span>,</span><br><span class="line">            s.<span class="title function_">push</span>(&#123;</span><br><span class="line">                <span class="attr">el</span>: a,</span><br><span class="line">                <span class="attr">x</span>: e.<span class="property">clientX</span> - <span class="number">5</span>,</span><br><span class="line">                <span class="attr">y</span>: e.<span class="property">clientY</span> - <span class="number">5</span>,</span><br><span class="line">                <span class="attr">scale</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">alpha</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">color</span>: <span class="title function_">c</span>()</span><br><span class="line">            &#125;),</span><br><span class="line">            t.<span class="property">body</span>.<span class="title function_">appendChild</span>(a)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">i</span>(<span class="params">e</span>) &#123;</span><br><span class="line">        <span class="keyword">var</span> a = t.<span class="title function_">createElement</span>(<span class="string">&quot;style&quot;</span>);</span><br><span class="line">        a.<span class="property">type</span> = <span class="string">&quot;text/css&quot;</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            a.<span class="title function_">appendChild</span>(t.<span class="title function_">createTextNode</span>(e))</span><br><span class="line">        &#125; <span class="keyword">catch</span>(t) &#123;</span><br><span class="line">            a.<span class="property">styleSheet</span>.<span class="property">cssText</span> = e</span><br><span class="line">        &#125;</span><br><span class="line">        t.<span class="title function_">getElementsByTagName</span>(<span class="string">&quot;head&quot;</span>)[<span class="number">0</span>].<span class="title function_">appendChild</span>(a)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">c</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;rgb(&quot;</span> + ~~ (<span class="number">255</span> * <span class="title class_">Math</span>.<span class="title function_">random</span>()) + <span class="string">&quot;,&quot;</span> + ~~ (<span class="number">255</span> * <span class="title class_">Math</span>.<span class="title function_">random</span>()) + <span class="string">&quot;,&quot;</span> + ~~ (<span class="number">255</span> * <span class="title class_">Math</span>.<span class="title function_">random</span>()) + <span class="string">&quot;)&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> s = [];</span><br><span class="line">    e.<span class="property">requestAnimationFrame</span> = e.<span class="property">requestAnimationFrame</span> || e.<span class="property">webkitRequestAnimationFrame</span> || e.<span class="property">mozRequestAnimationFrame</span> || e.<span class="property">oRequestAnimationFrame</span> || e.<span class="property">msRequestAnimationFrame</span> ||</span><br><span class="line">        <span class="keyword">function</span>(<span class="params">e</span>) &#123;</span><br><span class="line">            <span class="built_in">setTimeout</span>(e, <span class="number">1e3</span> / <span class="number">60</span>)</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="title function_">i</span>(<span class="string">&quot;.heart&#123;width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);&#125;.heart:after,.heart:before&#123;content: &#x27;&#x27;;width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;&#125;.heart:after&#123;top: -5px;&#125;.heart:before&#123;left: -5px;&#125;&quot;</span>),</span><br><span class="line">        <span class="title function_">n</span>(),</span><br><span class="line">        <span class="title function_">r</span>()</span><br><span class="line">&#125; (<span class="variable language_">window</span>, <span class="variable language_">document</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>鼠标滑动气泡跟随特效<sup><a id="link5" href="#ref5">-5-</a></sup></p>
+<p>首先感谢原作者的分享，可以根据引用链接移步到对应网站下载免费的源码资源</p>
+<p>下载的文件其本身包含了一些其他的页面效果，所以需要对其进行代码清理，仅保留气泡跟随特效即可</p>
+<p>该文件需要依赖sketch.min.js文件，故首先需要将该文件放置到主题文件夹下&#x2F;source&#x2F;js文件夹中</p>
+<p>然后将简化后的特效js代码直接加入到主题文件夹下&#x2F;layout&#x2F;layout.ejs中，其中需要引用依赖</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script type=<span class="string">&quot;text/javascript&quot;</span> src=<span class="string">&quot;/js/sketch.min.js&quot;</span>&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>同时需要注意该代码生成canvas是基于页面内元素的，而代码执行顺序的原因，不能在div中生成，只能修改为根据body生成</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> demo = <span class="title class_">Sketch</span>.<span class="title function_">create</span>(&#123;</span><br><span class="line">	container : <span class="variable language_">document</span>.<span class="title function_">getElementsByTagName</span>(<span class="string">&quot;body&quot;</span>)[<span class="number">0</span>]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>但是经过这样的修改之后，页面将分成两部分：原始页面（由class为wrapper的div为父级的结构）和新生成的canvas，所以还需要对canvas的样式进行定义，在主题文件夹下&#x2F;source&#x2F;css&#x2F;layout.styl中编写样式，让canvas保持和页面位置大小完全一致</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">canvas</span></span><br><span class="line">  <span class="attribute">position</span> fixed</span><br><span class="line">  <span class="attribute">bottom</span> <span class="number">0</span></span><br><span class="line">  <span class="attribute">overflow</span> hidden</span><br><span class="line">  <span class="attribute">height</span> auto</span><br><span class="line">  <span class="attribute">width</span> <span class="number">100%</span> </span><br></pre></td></tr></table></figure>
+
+<p>此时会发现，特效虽然可行了，但原始页面中所有操作都被屏蔽了</p>
+<p>但是不能直接在canvas的样式中加入pointer-events none，因为会导致特效作用失效</p>
+<p>所以只能对其他部分进行控制，需要能交互的部分加入pointer-events auto，此时特效会被屏蔽</p>
+<p>不需要进行控制的部分可以让特效生效，则加入pointer-events none即可</p>
+<p>我在页脚允许特效生效，但页脚中的链接也要可点击，则样式为：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.footer</span></span><br><span class="line">  <span class="attribute">height</span> <span class="number">4rem</span></span><br><span class="line">  <span class="attribute">width</span> <span class="number">100%</span></span><br><span class="line">  <span class="attribute">text-align</span> center</span><br><span class="line">  <span class="attribute">line-height</span> <span class="number">4rem</span></span><br><span class="line">  <span class="attribute">padding-top</span> <span class="number">2em</span></span><br><span class="line">  <span class="attribute">pointer-events</span> <span class="attribute">none</span></span><br><span class="line"></span><br><span class="line"><span class="selector-class">.footer</span> <span class="selector-tag">a</span></span><br><span class="line">  <span class="attribute">pointer-events</span> auto</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>当然除了这些特效之外，还有很多很棒的特效，可以根据需要获取，然后加在需要的地方即可，操作原理是一致的</p>
+<h4 id="页面定制"><a href="#页面定制" class="headerlink" title="页面定制"></a>页面定制</h4><p>这里的页面定制不是指修改原主题的样式，因为并不是要从0开始编写个人的主题</p>
+<p>这里的页面定制指类似About页和新添加的页面这种没有样式的页面，不通过直接编写.md文件的方式，而是通过集成页面到主题中的方式进行的定制（即使用html一类的代码编写方式实现）</p>
+<ul>
+<li><p>如何从头开始定制一页友链页（新添加页）</p>
+<p>首先在主题的_config.yml配置中配置一个新的标签（前面的Key可以为中文）</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">nav:</span></span><br><span class="line">  <span class="string">友链:</span> <span class="string">/friend</span></span><br></pre></td></tr></table></figure>
+
+<p>然后在Git命令界面创建一个新的页面</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page friend</span><br></pre></td></tr></table></figure>
+
+<p>找到新页面对应的.md文件，位置在&#x2F;source&#x2F;friend&#x2F;index.md</p>
+<p>在文章中编写对应关联链接（title可以任写），layout配置项请小写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">title: 友链</span><br><span class="line">layout: friend</span><br><span class="line">date: YYYY-MM-DD HH:MM:SS</span><br></pre></td></tr></table></figure>
+
+<p>此时如果你在运行本地浏览器，则Git命令界面中会报错，因为找不到主题文件夹的&#x2F;layout中friend文件的位置</p>
+<p>所以请在主题文件夹的&#x2F;layout下创建新的friend.ejs文件，可以直接在该文件中编写html信息</p>
+<p>如果需要分离页面和内容，则还需要在主题文件夹的&#x2F;layout&#x2F;_page下再创建新的friend.ejs文件，这个是负责内容相关的脚本</p>
+<p>我采用的就是分离的形式，文章以下称&#x2F;layout&#x2F;friend.ejs为外部ejs，称&#x2F;layout&#x2F;_page&#x2F;friend.ejs为内部ejs</p>
+<p>外部ejs中可以定制页面一些大体样式，比如加入特效等；内部ejs中主要用于布局和展示友链</p>
+<p>首先在外部ejs中关联内部ejs，div的内容复制自主题中已经编写好的代码</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;div <span class="keyword">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;post-wrap&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">h2</span> <span class="attr">class</span>=<span class="string">&quot;post-title&quot;</span>&gt;</span>-<span class="symbol">&amp;nbsp;</span>友链<span class="symbol">&amp;nbsp;</span>-<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;%- <span class="title function_">partial</span>(<span class="string">&#x27;_page/friend&#x27;</span>) %&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这样已经算是定制好这个页面了，剩下的工作就是美化这个界面了</p>
+</li>
+<li><p>美化空白页面-动画特效</p>
+<p>我想要页面中有一个蜡烛的特效小动画<sup><a id="link6" href="#ref6">-6-</a></sup>，源码请根据引用链接移步到对应网站免费下载</p>
+<p>蜡烛小动画的源码下载下来后，同样需要进行整理，仅留下需要的部分</p>
+<p>由于小动画是纯css实现的效果，所以文件最终分为html部分和css部分</p>
+<p>首先将html部分放到外部ejs中，以下仅展示部分代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;div <span class="keyword">class</span>=<span class="string">&quot;candles_wrapper&quot;</span>&gt;</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;candles&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;candles_light__wave&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;candle1&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;candle1__body&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;candle1__eyes&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">            <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;candle1__eyes-one&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">            <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;candle1__eyes-two&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;candle1__mouth&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;candle1__stick&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>然后到主题文件夹的&#x2F;source&#x2F;css&#x2F;_page下创建friend.styl文件，用于保存friend页面中自定义的样式表文件</p>
+<p>所以将css部分放到friend.styl文件中，以下仅展示部分代码：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.candles_wrapper</span> &#123;</span><br><span class="line">	<span class="attribute">position</span>: fixed;</span><br><span class="line">	<span class="attribute">left</span>: <span class="number">85%</span>;</span><br><span class="line">	<span class="attribute">bottom</span>: <span class="number">1%</span>;</span><br><span class="line">	<span class="attribute">transform</span>: <span class="built_in">scale</span>(<span class="number">1</span>, <span class="number">1</span>) <span class="built_in">translate</span>(-<span class="number">50%</span>, -<span class="number">50%</span>);</span><br><span class="line">	<span class="attribute">pointer-events</span>: none;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="selector-class">.candles_floor</span> &#123;</span><br><span class="line">	<span class="attribute">position</span>: absolute;</span><br><span class="line">	<span class="attribute">left</span>: <span class="number">50%</span>;</span><br><span class="line">	<span class="attribute">top</span>: <span class="number">50%</span>;</span><br><span class="line">	<span class="attribute">width</span>: <span class="number">150px</span>;</span><br><span class="line">	<span class="attribute">height</span>: <span class="number">5px</span>;</span><br><span class="line">	<span class="attribute">background</span>: <span class="number">#673C63</span>;</span><br><span class="line">	<span class="attribute">transform</span>: <span class="built_in">translate</span>(-<span class="number">45%</span>, -<span class="number">50%</span>);</span><br><span class="line">	<span class="attribute">box-shadow</span>: <span class="number">0px</span> <span class="number">2px</span> <span class="number">5px</span> <span class="number">#111</span>;</span><br><span class="line">	<span class="attribute">z-index</span>: <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：新建的.styl文件需要关联到主题文件夹的&#x2F;source&#x2F;css&#x2F;style.styl文件中，否则无法读取生效</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@import</span> <span class="string">&quot;_page/friend.styl&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>至此就能在页面中看到动画的显示了</p>
+</li>
+<li><p>美化空白页面-友链Item</p>
+<p>因为新建了friend.styl文件，所以为了方便，不管外部ejs还是内部ejs的样式都可以放到这里面统一管理</p>
+<p>内部ejs专注排版和友链item的生成，我希望可以通过配置以决定item的生成</p>
+<p>所以首先在主题的_config.yml配置中根据需要定义好友链的配置结构：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里是我需要的信息定义，建议定义为列表形式，方便代码中ForEach遍历</span></span><br><span class="line"><span class="attr">friends:</span></span><br><span class="line">	<span class="bullet">-</span> <span class="attr">f_name:</span> 		<span class="comment">#名称</span></span><br><span class="line">	  <span class="attr">f_site:</span> 		<span class="comment">#站点链接</span></span><br><span class="line">	  <span class="attr">f_ma:</span> 		<span class="comment">#二维码</span></span><br><span class="line">	  <span class="attr">f_siteIcon:</span> 		<span class="comment">#头像</span></span><br><span class="line">	  <span class="attr">f_desImg:</span> 		<span class="comment">#描述页背景图</span></span><br><span class="line"> 	  <span class="attr">f_desImgAni:</span> 		<span class="comment">#描述页背景图动画（可选）</span></span><br><span class="line">	  <span class="attr">f_des:</span> 		<span class="comment">#描述</span></span><br></pre></td></tr></table></figure>
+
+<p>然后在内部ejs中定义自动遍历配置生成的代码（尤其注意要判null）：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;div <span class="keyword">class</span>=<span class="string">&quot;friend_container&quot;</span>&gt;</span><br><span class="line">	&lt;% <span class="keyword">if</span> (theme.<span class="property">friends</span> !== <span class="literal">null</span>) &#123; %&gt;</span><br><span class="line">		&lt;% theme.<span class="property">friends</span>.<span class="title function_">forEach</span>(<span class="function"><span class="params">item</span> =&gt;</span> &#123; %&gt;</span><br><span class="line">			&lt;div class=&quot;friend_single friend_effect&quot;&gt;</span><br><span class="line">				&lt;% if (item.f_ma !== null) &#123; %&gt;</span><br><span class="line">					&lt;a href=&quot;#&quot;&gt;</span><br><span class="line">				&lt;% &#125; else &#123; %&gt;</span><br><span class="line">					&lt;a href=&quot;&lt;%- url_for(item.f_site) %&gt;&quot;&gt;</span><br><span class="line">				&lt;% &#125; %&gt;</span><br><span class="line">					&lt;div class=&quot;friend_member-info&quot;&gt;</span><br><span class="line">						&lt;h3&gt;&lt;%- item.f_name %&gt;&lt;/h3&gt;</span><br><span class="line">						&lt;h5&gt;&lt;%- item.f_site %&gt;&lt;/h5&gt;</span><br><span class="line">						&lt;% if (item.f_ma !== null) &#123; %&gt;</span><br><span class="line">						&lt;img class=&quot;friend_tooltipimg&quot; src=&quot;&lt;%- url_for(item.f_ma) %&gt;&quot;&gt;</span><br><span class="line">						&lt;% &#125; %&gt;</span><br><span class="line">					&lt;/div&gt;</span><br><span class="line">				&lt;/a&gt;</span><br><span class="line">				&lt;div class=&quot;friend_member-image&quot;&gt;</span><br><span class="line">					&lt;img src=&quot;&lt;%- url_for(item.f_siteIcon) %&gt;&quot; alt=&quot;Myfriend&quot;&gt;</span><br><span class="line">				&lt;/div&gt;</span><br><span class="line">				&lt;div class=&quot;friend_more-info&quot;&gt;</span><br><span class="line">					&lt;div class=&quot;friend_info-container&quot;&gt;</span><br><span class="line">						&lt;% if (item.f_desImg !== null) &#123; %&gt;</span><br><span class="line">							&lt;img class=&quot;&lt;%- item.f_desImgAni %&gt;&quot; src=&quot;&lt;%- url_for(item.f_desImg) %&gt;&quot; alt=&quot;Hello&quot;&gt;</span><br><span class="line">						&lt;% &#125; %&gt;</span><br><span class="line">						&lt;p&gt;&lt;%- item.f_des %&gt;&lt;/p&gt;</span><br><span class="line">					&lt;/div&gt;</span><br><span class="line">				&lt;/div&gt;</span><br><span class="line">			&lt;/div&gt;</span><br><span class="line">		&lt;% &#125;); %&gt;</span><br><span class="line">	&lt;% &#125; %&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>以上就能根据配置生成item了，当然所有的样式都放到friend.styl里即可</p>
+</li>
+</ul>
+<p>至此，一个定制页面就完成了！同样的方法可以定制任意界面</p>
+<p>相同的模式，可以由一个主题框架中定制所有个性化的页面，即相当于自己写一个主题</p>
+<p>原理如此，其他就是发挥审美和想象力进行设计了</p>
+<h2 id="markdown魔法"><a href="#markdown魔法" class="headerlink" title="markdown魔法"></a>markdown魔法</h2><p>博客网站最主要的功能还是进行博文分享</p>
+<p>在Hexo中博文均通过.md文件中进行编写</p>
+<p>使用new指令生成的.md文件均保存在&#x2F;source&#x2F;_post文件夹下</p>
+<p>xxx.md文件在编写时可以进行基本配置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: 最终显示的博文标题</span><br><span class="line">date: 自动生成的时间，可以自己修改</span><br><span class="line">tags: [xx, xx] 可以同时编辑多个标签（可选）</span><br><span class="line">categories: xx 目录（可选）</span><br></pre></td></tr></table></figure>
+
+<p>之后就可以正常进行编写了</p>
+<p>但有时候，想要自定义加入一些展示形式，或者根据当前博文内容改变博客界面效果</p>
+<p>这时候就需要使用到markdown魔法了，虽然markdown和html并不能画等号，但是markdown兼容很多html的用法，可以通过这些用法，直接达到自定义控制界面的目的</p>
+<p>但注意：不应该在markdown中加入过多的效果，否则可能导致页面卡顿，或者因命名冲突而造成的失效问题，或者一些因不兼容造成的不可预见的功能失效问题</p>
+<p>以下就介绍几种我认为会比较常用的markdown魔法：</p>
+<h3 id="md引入音频、视频"><a href="#md引入音频、视频" class="headerlink" title="md引入音频、视频"></a>md引入音频、视频</h3><p>在markdown中引入音频、视频是比较常用的操作，引入的方式有两大类：通过本地仓库引入以及通过网站外链引入，接下来将对两种方式均进行讲解</p>
+<ul>
+<li><p>通过本地仓库引入</p>
+<p>本地仓库顾名思义就是public文件夹中的资源，也是最终会上传到github仓库中的资源</p>
+<p>通过相对路径索引文件并引入到.md文件中，本地引入时直接使用标签即可：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 引入音频 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">audio</span> <span class="attr">controls</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">source</span> <span class="attr">src</span>=<span class="string">&quot;/相对路径/xxx.mp3&quot;</span> <span class="attr">type</span>=<span class="string">&quot;audio/mpeg&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">audio</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>audio标签相关属性<sup><a id="link7" href="#ref7">-7-</a></sup>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">属性</th>
+<th align="center">值</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">autoplay</td>
+<td align="center">autoplay</td>
+<td align="center">如果出现该属性，则音频在就绪后马上播放</td>
+</tr>
+<tr>
+<td align="center">controls</td>
+<td align="center">controls</td>
+<td align="center">如果出现该属性，则向用户显示音频控件（比如播放&#x2F;暂停按钮）</td>
+</tr>
+<tr>
+<td align="center">loop</td>
+<td align="center">loop</td>
+<td align="center">如果出现该属性，则每当音频结束时重新开始播放</td>
+</tr>
+<tr>
+<td align="center">muted</td>
+<td align="center">muted</td>
+<td align="center">如果出现该属性，则音频输出为静音</td>
+</tr>
+<tr>
+<td align="center">preload</td>
+<td align="center">auto<br>metadata<br>none</td>
+<td align="center">规定当网页加载时，音频是否默认被加载以及如何被加载</td>
+</tr>
+<tr>
+<td align="center">src</td>
+<td align="center">URL</td>
+<td align="center">规定音频文件的 URL</td>
+</tr>
+</tbody></table>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 引入视频 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">video</span> <span class="attr">width</span>=<span class="string">&quot;320&quot;</span> <span class="attr">height</span>=<span class="string">&quot;240&quot;</span> <span class="attr">controls</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">source</span> <span class="attr">src</span>=<span class="string">&quot;/相对路径/xxx.mp4&quot;</span> <span class="attr">type</span>=<span class="string">&quot;video/mp4&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">video</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>video标签相关属性<sup><a id="link8" href="#ref8">-8-</a></sup>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">属性</th>
+<th align="center">值</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">autoplay</td>
+<td align="center">autoplay</td>
+<td align="center">如果出现该属性，则视频在就绪后马上播放</td>
+</tr>
+<tr>
+<td align="center">controls</td>
+<td align="center">controls</td>
+<td align="center">如果出现该属性，则向用户显示控件，比如播放按钮</td>
+</tr>
+<tr>
+<td align="center">height</td>
+<td align="center">pixels</td>
+<td align="center">设置视频播放器的高度</td>
+</tr>
+<tr>
+<td align="center">loop</td>
+<td align="center">loop</td>
+<td align="center">如果出现该属性，则当媒介文件完成播放后再次开始播放</td>
+</tr>
+<tr>
+<td align="center">muted</td>
+<td align="center">muted</td>
+<td align="center">如果出现该属性，视频的音频输出为静音</td>
+</tr>
+<tr>
+<td align="center">poster</td>
+<td align="center">URL</td>
+<td align="center">规定视频正在下载时显示的图像，直到用户点击播放按钮</td>
+</tr>
+<tr>
+<td align="center">preload</td>
+<td align="center">auto<br/>metadata<br/>none</td>
+<td align="center">如果出现该属性，则视频在页面加载时进行加载，并预备播放<br>如果使用 “autoplay”，则忽略该属性</td>
+</tr>
+<tr>
+<td align="center">src</td>
+<td align="center">URL</td>
+<td align="center">要播放的视频的 URL</td>
+</tr>
+<tr>
+<td align="center">width</td>
+<td align="center">pixels</td>
+<td align="center">设置视频播放器的宽度</td>
+</tr>
+</tbody></table>
+<p>通过标签引入的方法不局限于本地仓库，也可以使用网络链接（绝对路径），只要可以保证有效就行</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">audio</span> <span class="attr">controls</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">source</span> <span class="attr">src</span>=<span class="string">&quot;https://xxxxxxxxxxx&quot;</span> <span class="attr">type</span>=<span class="string">&quot;audio/mpeg&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">audio</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">video</span> <span class="attr">width</span>=<span class="string">&quot;320&quot;</span> <span class="attr">height</span>=<span class="string">&quot;240&quot;</span> <span class="attr">controls</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">source</span> <span class="attr">src</span>=<span class="string">&quot;https://xxxxxxxxxxx&quot;</span> <span class="attr">type</span>=<span class="string">&quot;video/mp4&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">video</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>通过标签引入的方式，其优点在于自由度相对更高，提供了更多可供个性化设计的功能</p>
+<p>最自由的方式就是通过自己写DOM，然后通过js监听并获取到需要的属性再进行样式定制，这种方式虽然比较复杂，但个性化程度高</p>
+<p>一般情况下都是做一些比较有限的简单的修改，所以建议使用css和webkit属性的方法快捷定制（主要是写到.md文件中也很简单）</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 这里列出的是部分选择器，包含了可以对<span class="selector-tag">audio</span>进行修改的属性</span><br><span class="line"><span class="selector-tag">audio</span>::-webkit-media-controls-panel				// 整体背景面</span><br><span class="line">audio::-webkit-media-controls-mute-button			// 音量按钮</span><br><span class="line">audio::-webkit-media-controls-play-button			// 播放按钮</span><br><span class="line">audio::-webkit-media-controls-current-time-display		// 播放时间</span><br><span class="line">audio::-webkit-media-controls-time-remaining-display		// 剩余时间</span><br><span class="line">audio::-webkit-media-controls-timeline				// 进度条</span><br><span class="line">audio::-webkit-media-controls-volume-slider			// 音量控制条</span><br><span class="line">audio::-webkit-media-controls-seek-back-button			// 下一首按钮</span><br><span class="line">audio::-webkit-media-controls-seek-forward-button		// 上一首按钮</span><br><span class="line">audio::-webkit-media-controls-fullscreen-button</span><br><span class="line">audio::-webkit-media-controls-rewind-button</span><br><span class="line">audio::-webkit-media-controls-toggle-closed-captions-button</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 这里列出的是部分选择器，包含了可以对<span class="selector-tag">video</span>进行修改的属性</span><br><span class="line"><span class="selector-tag">video</span>::-webkit-media-controls-fullscreen-button			// 全屏按钮</span><br><span class="line">video::-webkit-media-controls-play-button			// 播放按钮</span><br><span class="line">video::-webkit-media-controls-timeline				// 进度条</span><br><span class="line">video::-webkit-media-controls-current-time-display		// 播放时间</span><br><span class="line">video::-webkit-media-controls-time-remaining-display		// 剩余时间</span><br><span class="line">video::-webkit-media-controls-mute-button			// 音量按钮</span><br><span class="line">video::-webkit-media-controls-volume-slider			// 音量控制条</span><br><span class="line">video::-webkit-media-controls-toggle-closed-captions-button</span><br></pre></td></tr></table></figure>
+
+<p>这些修改可以直接在.md文件中进行，然后直接对该.md文件的页面起作用，具体请见【- md引入js和css自定义界面 -】章节</p>
+<p>（注意：想要看audio或者video的结构，首先在页面中有一个audio&#x2F;video组件，然后使用谷歌浏览器F12开启开发者工具，选择设置（Settings），在偏好设置（Preferences）中找到组件项（Elements），勾选Show user agent shadow DOM即可查看其内部结构）</p>
+</li>
+<li><p>通过网站外链引入</p>
+<p>网站外链的形式，非常方便快捷，不需要将文件存到仓库中占用位置，但其缺点是可供个性化的程度较低，且外链可能因为版权、链接缺失等问题导致使用起来不稳定</p>
+<p>外链引用是通过iframe标签进行引入的，即在对应位置生成一个自定义尺寸的区域框，里面可以嵌入音频、视频、网页等来自其他网站的资源</p>
+<p>首先介绍引入音频，以网易云音乐为例：</p>
+<p>进入网页端网易云音乐，找到需要的歌曲，然后选择生成外链，在生成界面中定制播放器样式，然后直接复制外链代码，粘贴到.md文件需要的位置即可</p>
+<p><img class="guide_img" src="/image/posts/post1/14.png" alt="选择生成外链" width=60%><br></p>
+<img class="guide_img" src="/image/posts/post1/15.png" alt="复制外链代码" width=60%>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 外链中已经定制了一些必要的iframe样式 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">&quot;no&quot;</span> <span class="attr">border</span>=<span class="string">&quot;0&quot;</span> <span class="attr">marginwidth</span>=<span class="string">&quot;0&quot;</span> <span class="attr">marginheight</span>=<span class="string">&quot;0&quot;</span> <span class="attr">width</span>=<span class="string">330</span> <span class="attr">height</span>=<span class="string">86</span> <span class="attr">src</span>=<span class="string">&quot;xxxx&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后是引入视频的介绍，以Bilibili为例：</p>
+<p>进去B站的网页，找到想要引入的视频，然后点击分享按钮，分享方式中选择嵌入代码并点击，代码会自动复制到剪贴板，然后直接将之粘贴到.md文件需要的位置即可</p>
+<img class="guide_img" src="/image/posts/post1/16.png" alt="b站生成外链" width=60%>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 外链中已经定制了粉色系播放器样式 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;xxxx&quot;</span> <span class="attr">scrolling</span>=<span class="string">&quot;no&quot;</span> <span class="attr">border</span>=<span class="string">&quot;0&quot;</span> <span class="attr">frameborder</span>=<span class="string">&quot;no&quot;</span> <span class="attr">framespacing</span>=<span class="string">&quot;0&quot;</span> <span class="attr">allowfullscreen</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>至于为何使用iframe引入的方式会出现个性化的程度低呢？那是因为iframe引入的资源本质就是一个制作好的html页面，所以要做到将iframe的内容页面个性化就不是很简单了</p>
+<p>本文将使用iframe引入资源的页面称为父页面，将iframe内容页面称为子页面</p>
+<p>如果父页面和子页面是同域的，即是说可以从父页面直接控制子页面，这样的情况是比较简单的，可以在父页面的代码中直接监听并修改子页面中的样式表</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 这里是在iframe内容加载完成后运行函数的示意 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;xxxx&quot;</span> <span class="attr">onload</span>=<span class="string">&quot;LoadComplete()&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">function</span> <span class="title function_">LoadComplete</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="language-javascript">    &#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="comment">// do something</span></span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>但是如果父页面和子页面不是同域的，即是跨域的，那就情况就很复杂了</p>
+<p>这种情况下父页面若是想修改子页面的样式信息，就需要和子页面建立通信关系，然后使用postMessage方法进行跨域通信，此时需要在子页面中定义一个接收消息的处理函数，父页面发送的请求才能被子页面处理</p>
+<p>如果子页面是自己管理并上传到网络的就还好，可以自行添加函数，但是用外链方式获取的网络资源，其页面的编写和管理权限并不在自己这里，所以如果子页面不允许或者没有对应的通信函数，那么父页面的请求只有爱莫能助了</p>
+</li>
+<li><p>使用插件</p>
+<p>以上已经介绍了两种引入方式，但其实还有一种更加便捷的方式引入音频、视频，那就是使用插件</p>
+<p>插件的本质也是使用audio和video标签引入，只不过提供了已经定制好的较为美观的界面、比个人编写时更全面的功能、以及更加简单的添加方式</p>
+<p>hexo-tag-aplayer<sup><a id="link9" href="#ref9">-9-</a></sup>是音频引入的插件，hexo-tag-dplayer<sup><a id="link10" href="#ref10">-10-</a></sup>是视频引入的插件</p>
+<p>两者使用方式均一致，通过Hexo标签进行引用，其中包含了很多可供自定义的参数，根据实际需要配置即可</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% hexo-tag %&#125;			//hexo标签形式示意</span><br></pre></td></tr></table></figure>
+
+<p>具体安装和使用的方法请根据链接移步插件文档获取，我这里因为没有使用插件，所以就不加赘述了</p>
+</li>
+</ul>
+<h3 id="md引入Unity-Web-Player"><a href="#md引入Unity-Web-Player" class="headerlink" title="md引入Unity Web Player"></a>md引入Unity Web Player</h3><p>我有时可能会在博文中分享一些Demo，所以如果能直接在网页上展示是最好不过的了</p>
+<p>于是研究一下Unity WebGL相关的东西，发现其实Unity WebGL项目打包出来之后也就是一个网页，即是说其实质与上面所说的音频、视频外链是一样的东西，只不过这个网页是可以放在本地仓库的，并且该网页是由发布者本人管理的</p>
+<p>虽然运行文件打包出来是一个index.html，但是Unity Web Player是不支持直接播放的，需要有网络服务器支持的情况下才能打开</p>
+<p>所以如果是在VS Code中调试，则安装Live Server插件，用该插件开启即可；如果是插入到.md文件中，则需要插入可以运行在网站里的.md文件中，并使用hexo s开启localhost后才能运行</p>
+<ul>
+<li><p>Unity输出WebGL可执行文件</p>
+<p>首先需要在Unity Hub中安装专门用于WebGL打包的组件</p>
+<p>然后需要Build，首先把Scene加入到打包列表中，选择输出平台为WebGL，然后点击切换平台，系统自动匹配平台相应数据后，点击Build Setting，进行一些必要设置修改：</p>
+<p>这里设置的分辨率直接决定了最终输出的index.html中canvas的尺寸，也就是游戏显示区域的大小；选择WebGL输出模板时建议使用默认的（我尝试了Minimal打包，包体确实小很多，但加到.md中没办法运行，不过不排除是其他设置有问题或者是我在使用时没讲武德，所以实际操作的时候都可以试试看，毕竟包体要小一半还是很香的::&gt;_&lt;::）</p>
+<img class="guide_img" src="/image/posts/post1/17.png" alt="分辨率设置" width=70%>
+
+<p>然后选择其他设置（Other Settings），这里最好把图中指示的编码质量修改为中质量</p>
+<img class="guide_img" src="/image/posts/post1/18.png" alt="修改编码质量" width=70%>
+
+<p>最后选择输出设置（Publishing Settings），建议将压缩格式修改为Disabled（我测试了使用默认的Gzip，输出的包体引入.md文件后没办法运行，这里我是控制变量试出来的，信我ヽ(◕ω ◕｀ヽ)）</p>
+<img class="guide_img" src="/image/posts/post1/19.png" alt="输出设置" width=70%>
+
+<p>以上设置好之后，就可以直接输出文件了，输出的文件包含了一个index.html文件以及两个支持文件夹，包含了js文件和css文件，这三大件需要在保证相对路径的情况下放到仓库中</p>
+<img class="guide_img" src="/image/posts/post1/20.png" alt="输出的文件" width=40%>
+</li>
+<li><p>使用iframe引入</p>
+<p>因为执行文件是.html格式，所以要插入到.md中就需要使用到iframe标签</p>
+<p>（注意：iframe标签需要依赖环境支持，若是在不支持iframe的浏览器环境下，实在要嵌入内容的话，就只能尝试复制.html的内容部分到.md文件中了）</p>
+<p>iframe标签引入的时候，会在页面中建立一个带有滑动条的窗口，关联的内容页就显示在窗口之中，如果想要内容在页面中呈现出类似.md文件插入图片一样的展示效果，还需要做一些额外设置（比如设置大小正好适配窗口，去掉滑动条等）</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">width</span>=<span class="string">100%</span> <span class="attr">height</span>=<span class="string">500px</span> <span class="attr">src</span>=<span class="string">&quot;/xxx/index.html&quot;</span> <span class="attr">scrolling</span>=<span class="string">&quot;no&quot;</span> <span class="attr">border</span>=<span class="string">&quot;0&quot;</span> <span class="attr">frameborder</span>=<span class="string">&quot;no&quot;</span> <span class="attr">framespacing</span>=<span class="string">&quot;0&quot;</span> <span class="attr">allowfullscreen</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- </span></span><br><span class="line"><span class="comment">这里设置窗口横向自适应，然后规定长度略微多于打包时设置的canvas长度，因为unity web player在原网页上是居中显示的，所以不用担心横向长度的问题</span></span><br><span class="line"><span class="comment">想要呈现嵌入效果，所以需要去掉默认的边框和滑动条：</span></span><br><span class="line"><span class="comment">scrolling - 滑动条		border - 边框</span></span><br><span class="line"><span class="comment">frameborder - 框架边框		framespacing - 框架边框宽度</span></span><br><span class="line"><span class="comment">将这些的显示都去掉之后，就会呈现出嵌入的效果了</span></span><br><span class="line"><span class="comment">--&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>至此，只要执行文件本身没问题，索引路径也没问题，就完成了Unity Web Player的引入，可以到网页中愉快的游戏了</p>
+<iframe width=100% height=500px src="/image/posts/post1/extend/out/index.html" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+
+<p>示例项目是我在某橙色小软件上买的Unity Demo案例，不清楚具体出处，<strong>如有侵权请邮件联系我更换&#x2F;删除</strong></p>
+<p>打地鼠示例项目玩法：点击页面开始游戏，直接通过点击敲打地鼠获得积分，时限为30s，30s后游戏自动结束，并回到开始页面（可重复玩，我发动老年人手速技能，最高玩到了540分）</p>
+</li>
+</ul>
+<h3 id="md引入Echarts"><a href="#md引入Echarts" class="headerlink" title="md引入Echarts"></a>md引入Echarts</h3><p>Echarts是常用于数据可视化的工具，通过各种图的表示，能将数据信息直观展示出来</p>
+<p>Echarts的使用很方便，而且有很多扩展用法，不止是数字的展示，还能展示时间线、分类等</p>
+<p>Echarts正常的使用方式是在需要的页面中引入.js文件，然后定义并实例化出图表对象，然后根据需要使用.html和css进行布局即可，然而我的需求是想要简单快捷的在.md文件对应的位置直接生成图表，实际上可以自己编写js插件来判断，但是这样就是在重复造轮子，所以我选择直接使用hexo-tags-echarts插件<sup><a id="link11" href="#ref11">-11-</a></sup>来达到目的</p>
+<ul>
+<li><p>导入插件</p>
+<p>首先下载到插件，仅包含一个echarts_tags.js文件，请根据链接移步到插件网站免费下载</p>
+<p>（该插件是使用Hexo标签进行定位的，在本地.md文件中无效，但是通过Hexo可以检测到对应的标签，然后执行插件内提供的方法，快速达到目的）</p>
+<p>下载好文件之后，将之放到Hexo站点根目录下的&#x2F;scripts文件夹中即可，我这里是放到主题文件夹的&#x2F;scripts文件夹下的，一样是生效的</p>
+<p>最后就可以在编写.md文件的时候通过Hexo标签直接在需要的位置引入图表了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">&#123;% echarts %&#125;</span><br><span class="line"><span class="comment">// 指定图表的配置项和数据</span></span><br><span class="line">option = &#123;</span><br><span class="line">  <span class="attr">angleAxis</span>: &#123;</span><br><span class="line">    <span class="attr">type</span>: <span class="string">&#x27;category&#x27;</span>,</span><br><span class="line">    <span class="attr">data</span>: [<span class="string">&#x27;Mon&#x27;</span>, <span class="string">&#x27;Tue&#x27;</span>, <span class="string">&#x27;Wed&#x27;</span>, <span class="string">&#x27;Thu&#x27;</span>, <span class="string">&#x27;Fri&#x27;</span>, <span class="string">&#x27;Sat&#x27;</span>, <span class="string">&#x27;Sun&#x27;</span>],</span><br><span class="line">    <span class="attr">axisLabel</span>: &#123;</span><br><span class="line">      <span class="attr">textStyle</span>: &#123;</span><br><span class="line">        <span class="attr">color</span>: <span class="string">&#x27;#96d9d8&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">radiusAxis</span>: &#123;<span class="attr">axisLabel</span>: &#123;</span><br><span class="line">      <span class="attr">textStyle</span>: &#123;</span><br><span class="line">        <span class="attr">color</span>: <span class="string">&#x27;#96d9d8&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;&#125;,</span><br><span class="line">  <span class="attr">polar</span>: &#123;&#125;,</span><br><span class="line">  <span class="attr">series</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;bar&#x27;</span>,</span><br><span class="line">      <span class="attr">data</span>: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">1</span>],</span><br><span class="line">      <span class="attr">coordinateSystem</span>: <span class="string">&#x27;polar&#x27;</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;A&#x27;</span>,</span><br><span class="line">      <span class="attr">stack</span>: <span class="string">&#x27;a&#x27;</span>,</span><br><span class="line">      <span class="attr">emphasis</span>: &#123;</span><br><span class="line">        <span class="attr">focus</span>: <span class="string">&#x27;series&#x27;</span>,</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;bar&#x27;</span>,</span><br><span class="line">      <span class="attr">data</span>: [<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>],</span><br><span class="line">      <span class="attr">coordinateSystem</span>: <span class="string">&#x27;polar&#x27;</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;B&#x27;</span>,</span><br><span class="line">      <span class="attr">stack</span>: <span class="string">&#x27;a&#x27;</span>,</span><br><span class="line">      <span class="attr">emphasis</span>: &#123;</span><br><span class="line">        <span class="attr">focus</span>: <span class="string">&#x27;series&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;bar&#x27;</span>,</span><br><span class="line">      <span class="attr">data</span>: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>],</span><br><span class="line">      <span class="attr">coordinateSystem</span>: <span class="string">&#x27;polar&#x27;</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;C&#x27;</span>,</span><br><span class="line">      <span class="attr">stack</span>: <span class="string">&#x27;a&#x27;</span>,</span><br><span class="line">      <span class="attr">emphasis</span>: &#123;</span><br><span class="line">        <span class="attr">focus</span>: <span class="string">&#x27;series&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">legend</span>: &#123;</span><br><span class="line">    <span class="attr">show</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">data</span>: [<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>],</span><br><span class="line">    <span class="attr">textStyle</span>: &#123;</span><br><span class="line">        <span class="attr">color</span>: <span class="string">&#x27;#96d9d8&#x27;</span></span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&#123;% endecharts %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用的是Echarts官网的示例<sup><a id="link12" href="#ref12">-12-</a></sup>来展示效果，实际使用的时候，可以在官网的实时在线编辑器中把效果都测试好，最后直接复制粘贴代码到需要的.md文件处即可</p>
+
+    <div id="echarts1058" style="width: 100%;height: 400px;margin: 0 auto"></div>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@4.9.0/dist/echarts.min.js"></script>
+
+    <script type="text/javascript">
+            // 基于准备好的dom，初始化echarts实例
+            var myecharts1058 = echarts.init(document.getElementById('echarts1058'));
+            // 指定图表的配置项和数据
+            // 指定图表的配置项和数据
+option = {
+  angleAxis: {
+    type: 'category',
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    axisLabel: {
+      textStyle: {
+        color: '#96d9d8'
+      }
+    }
+  },
+  radiusAxis: {axisLabel: {
+      textStyle: {
+        color: '#96d9d8'
+      }
+    }},
+  polar: {},
+  series: [
+    {
+      type: 'bar',
+      data: [1, 2, 3, 4, 3, 5, 1],
+      coordinateSystem: 'polar',
+      name: 'A',
+      stack: 'a',
+      emphasis: {
+        focus: 'series',
+      }
+    },
+    {
+      type: 'bar',
+      data: [2, 4, 6, 1, 3, 2, 1],
+      coordinateSystem: 'polar',
+      name: 'B',
+      stack: 'a',
+      emphasis: {
+        focus: 'series'
+      }
+    },
+    {
+      type: 'bar',
+      data: [1, 2, 3, 4, 1, 2, 5],
+      coordinateSystem: 'polar',
+      name: 'C',
+      stack: 'a',
+      emphasis: {
+        focus: 'series'
+      }
+    }
+  ],
+  legend: {
+    show: true,
+    data: ['A', 'B', 'C'],
+    textStyle: {
+        color: '#96d9d8'
+      }
+  }
+};
+            // 使用刚指定的配置项和数据显示图表。
+            myecharts1058.setOption(option);
+    </script>
+    
+</li>
+<li><p>图表自适应</p>
+<p>其实可以引入成功已经能满足大多数功能了，但奈何本人有强迫症，不小心动了一下界面尺寸，发现在大家都自觉自适应界面的时候，引入的图表画布是岿然不动，所以我根据官方文档，对图表进行了自适应的处理，即直接在.md文件中写入自适应代码</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;resize&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="language-javascript">	myChart.<span class="title function_">resize</span>();</span></span><br><span class="line"><span class="language-javascript">&#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>虽然自适应时的动画效果有点鬼畜，但好在确实能自适应了</p>
+<p>但很多时候，一个页面中可能会引入多个图表，所以试验了多个图表的情况，发现只有最后一个图表可以自适应，于是使用官方提供的获取实例的方法，发现除了最后一个图表存在实例之外，其他本应该为实例的图表均获取为undefined</p>
+<p>这是由于插件在生成图表时，使用的是同一个变量来实例化图表，所以该变量仅保存了最后一个图表的实例</p>
+<p>搜索该问题的解决方法时，发现方法大致分为两类：一类是在resize的监听函数中将所有自定义的图表依次进行resize()，另一类则是通过官方给的方法获取到页面中全部echarts实例之后再通过foreach自动进行resize()，尝试过后均未解决问题，因为我仅能获取到一个图表是实例状态，其他都是undefined</p>
+<p>所以最后通过对生成的html代码进行分析，使用了一个取巧又笨笨的方法解决了问题：通过变量名获取实例</p>
+<p>在生成的html文件中，用于实例化的变量是全局变量，所以才能直接取myChart.resize();来用，而此时罪魁祸首就是这个myChart导致前面生成的实例全都取不到了，所以只要每次生成的时候都是不同的唯一可标识的变量就行了</p>
+<ul>
+<li><p>方法一、是我觉得比较笨笨的方法</p>
+<p>通过分析echarts_tag.js发现，echarts对应的标签是可以带变长参数的，也就是说，每次使用标签生成表格的时候，可以传入变量名，此时需要修改echarts_tag.js，根据arg[2]的输入将对象命名</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> $&#123;args[<span class="number">2</span>]&#125; = echarts.<span class="title function_">init</span>(<span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;$&#123;chart_id&#125;&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>在使用标签的时候就这样写</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% echarts height width chartName%&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后在.md文件中添加自适应代码</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;resize&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="language-javascript">    chartName1.<span class="title function_">resize</span>();</span></span><br><span class="line"><span class="language-javascript">    chartName2.<span class="title function_">resize</span>();</span></span><br><span class="line"><span class="language-javascript">    ...</span></span><br><span class="line"><span class="language-javascript">&#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这个方法我没试验过，不保证有用，但理论上是可行的</p>
+<p>缺点就在于每次引入的时候都要给图表起名，最后还要手动汇总到一起，如果数量比较多的时候，就很麻烦了</p>
+</li>
+<li><p>方法二、是我目前采用的方法</p>
+<p>通过分析echarts_tag.js发现，代码中会给承载图表的div添加一个随机数ID，所以我将变量名修改为与这个ID相关联的项目就能唯一标识出实例变量，且变量名比较长，不容易出现相撞的问题，所以需要修改echarts_tag.js</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 本来代码中生成id的变量</span></span><br><span class="line"><span class="keyword">let</span> chart_id = <span class="string">&quot;echarts&quot;</span> + ((<span class="title class_">Math</span>.<span class="title function_">random</span>() * <span class="number">9999</span>) | <span class="number">0</span>);</span><br><span class="line"><span class="comment">// 这里是我加的，最终名字为myechartsxxxx</span></span><br><span class="line"><span class="keyword">let</span> name = <span class="string">&quot;my&quot;</span> + chart_id;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里将name字符串作为变量名使用，使用这个变量名的变量是当前表格的实例</span></span><br><span class="line"><span class="keyword">var</span> $&#123;name&#125; = echarts.<span class="title function_">init</span>(<span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;$&#123;chart_id&#125;&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>然后在要使用到图表的.md文件中添加自适应代码即可，只有一个图表的时候也能生效</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;resize&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">var</span> id_prev = <span class="string">&quot;echarts&quot;</span>;</span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">var</span> elements = <span class="variable language_">document</span>.<span class="title function_">querySelectorAll</span>(<span class="string">`[id^=&#x27;<span class="subst">$&#123;id_prev&#125;</span>&#x27;]`</span>);</span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">if</span>(elements.<span class="property">length</span>!==<span class="number">0</span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        elements.<span class="title function_">forEach</span>(<span class="keyword">function</span>(<span class="params">element</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="keyword">var</span> charts = <span class="variable language_">window</span>[<span class="string">&quot;my&quot;</span>+element.<span class="property">id</span>];</span></span><br><span class="line"><span class="language-javascript">            charts.<span class="title function_">resize</span>();</span></span><br><span class="line"><span class="language-javascript">        &#125;);</span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript">&#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里代码的意思是首先通过前缀找到所有承载图表的div元素（这样才能获取到生成的带随机数的ID）</p>
+<p>然后按之前在echarts_tag.js修改的逻辑，把变量名的字符串拼接起来</p>
+<p>最后使用window[变量名]的方法获取到该变量名所对应的变量（这个方式很少有使用到，而且前提是需要被查找的变量是全局变量，所以很取巧），这个变量实际就是图表实例，只需要对其进行resize()即可达到最终目标</p>
+<p>该方法我单独测试是有效的，这里考虑到篇幅长度，就不再增加一个图表来验证是否可行了，如果你和我的问题类似，可以尝试使用我的解决方案</p>
+<p>当然这个resize的方法还有很多优化空间，比如可以仅在窗口变动停止的时候再执行resize以提升性能，这些都是后话，目前我对性能优化还没有必须的需求，所以暂时不修改</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="md引入js和css自定义页面"><a href="#md引入js和css自定义页面" class="headerlink" title="md引入js和css自定义页面"></a>md引入js和css自定义页面</h3><p>实际这个通过.md文件自定义页面的方法，在前面的应用中早已经涉及到了，比如直接插入iframe框架，其实就是利用markdown的机制，直接引入html代码</p>
+<p>既然可以写html代码，那么将js和css也引入到页面中就是可行的</p>
+<p>和编写html时一样，可以直接将js或者css代码写到页面中，通过标签标明即可，也可以引入外部的js或者css文件，做到内容和样式、操作分离</p>
+<ul>
+<li><p>在.md中直接写js和css</p>
+<p>js使用script标签标明，css使用style标签标明，最好把这两部分代码写在整个内容的开头或者结尾，我是习惯将css写在开头，js写在结尾</p>
+<p>这里使用的markdown编辑工具是Typora，它可以切换内容编辑模式和源代码编辑模式</p>
+<p>这里图片展示的是本文在内容编辑模式中直接插入的代码，插入成功的js&#x2F;css代码会显示为灰色</p>
+<p><img class="guide_img" src="/image/posts/post1/21.png" alt="md插入JS" width=80%><br></p>
+<img class="guide_img" src="/image/posts/post1/22.png" alt="md插入CSS" width=80%>
+</li>
+<li><p>在.md中引入外部js和css</p>
+<p>可以通过html引入外部js和css使用的方式，在.md中引入</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 这里是引入css的代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;路径/xxx.css&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 这里是引入js的代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;路径/xxx.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就可以引入网站中的资源，或者自己创建的资源文件</p>
+<p>如果js和css内容太多，直接在.md文件中编辑不利于维护，此时可以选择将内容、样式、功能进行分离，在.md文件中仅引入需要使用到的资源文件（就像引入图片一样的方式），编辑就在对应的文件中进行即可</p>
+<p>引入自定义功能和样式，可以丰富文章在网站页面上展示的效果，通过.md文件个性化每一个对应页面的样式，只要是能够渲染出来的功能就可以尝试使用（要是前端技术过硬，想要炫技，甚至可以直接将博文做成交互式动画，当然还是要考虑性能问题的）</p>
+</li>
+<li><p>补充：页面内链接跳转</p>
+<p>在页面右侧，Chic主题提供了标题页面内跳转的功能</p>
+<p>但是文章中有很多引用链接，所以想要实现链接在页面内跳转的功能</p>
+<p>这里实现起来很简单，只需要在链接上加入a标签，通过id索引即可（sup标签表示上标）</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 这里是文章内上标，其id为link1，索引到id为ref1的位置（跳转到引用位置） --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">sup</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">id</span>=<span class="string">&quot;link1&quot;</span> <span class="attr">href</span>=<span class="string">&quot;#ref1&quot;</span>&gt;</span>- 1 -<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">sup</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 这里是引用部分序号，其id为ref1，索引到id为link1的位置（跳转回索引的位置） --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">id</span>=<span class="string">&quot;ref1&quot;</span> <span class="attr">href</span>=<span class="string">&quot;#link1&quot;</span>&gt;</span>[1]<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>至此相关的内容已经大致介绍完毕，后续如有更多心得积累，将在新的文章中记录</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a id="ref1" href="#link1">[1]</a>  DID迪视频教程：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Eg41157tL/">https://www.bilibili.com/video/BV1Eg41157tL/</a></p>
+<p><a id="ref2" href="#link2">[2]</a>  Hexo-WordCount插件：<a target="_blank" rel="noopener" href="https://www.npmjs.com/package/hexo-wordcount">https://www.npmjs.com/package/hexo-wordcount</a></p>
+<p><a id="ref3" href="#link3">[3]</a>  不蒜子官方使用文档：<a target="_blank" rel="noopener" href="https://ibruce.info/2015/04/04/busuanzi/">https://ibruce.info/2015/04/04/busuanzi/</a> </p>
+<p><a id="ref4" href="#link4">[4]</a>  鼠标点击特效参考自-程序猿刘川枫-：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/chuanfeng/p/14622967.html">https://www.cnblogs.com/chuanfeng/p/14622967.html</a></p>
+<p><a id="ref5" href="#link5">[5]</a>  鼠标滑动气泡跟随特效来源：<a target="_blank" rel="noopener" href="https://www.html5tricks.com/jquery-bubble-animation.html">https://www.html5tricks.com/jquery-bubble-animation.html</a></p>
+<p><a id="ref6" href="#link6">[6]</a>  蜡烛特效动画来源：<a target="_blank" rel="noopener" href="https://www.html5tricks.com/pure-css3-candle-animation.html">https://www.html5tricks.com/pure-css3-candle-animation.html</a></p>
+<p><a id="ref7" href="#link7">[7]</a>  audio标签相关属性：<a target="_blank" rel="noopener" href="https://www.runoob.com/tags/tag-audio.html">https://www.runoob.com/tags/tag-audio.html</a></p>
+<p><a id="ref8" href="#link8">[8]</a>  video标签相关属性：<a target="_blank" rel="noopener" href="https://www.runoob.com/tags/tag-video.html">https://www.runoob.com/tags/tag-video.html</a></p>
+<p><a id="ref9" href="#link9">[9]</a>  音频导入插件hexo-tag-aplayer：<a target="_blank" rel="noopener" href="https://github.com/MoePlayer/hexo-tag-aplayer">https://github.com/MoePlayer/hexo-tag-aplayer</a></p>
+<p><a id="ref10" href="#link10">[10]</a>  视频导入插件hexo-tag-dplayer：<a target="_blank" rel="noopener" href="https://github.com/MoePlayer/hexo-tag-dplayer">https://github.com/MoePlayer/hexo-tag-dplayer</a></p>
+<p><a id="ref11" href="#link11">[11]</a>  Echarts导入插件hexo-tags-echarts：<a target="_blank" rel="noopener" href="https://www.mingdao.me/Hexo/hexo-tags-echarts/">https://www.mingdao.me/Hexo/hexo-tags-echarts/</a></p>
+<p><a id="ref12" href="#link12">[12]</a>  Echarts示例：<a target="_blank" rel="noopener" href="https://echarts.apache.org/examples/zh/editor.html?c=bar-polar-stack-radial">https://echarts.apache.org/examples/zh/editor.html?c=bar-polar-stack-radial</a></p>
+<p><br>哦呼呼，终于写完了，虽然不是全部内容，但是个人感觉基本都写到了，～(￣▽￣～)啊啊就这样吧，摆烂！</p>
+<script>
+window.addEventListener('resize', () => {
+    var id_prev = "echarts";
+    var elements = document.querySelectorAll(`[id^='${id_prev}']`);
+    if(elements.length!==0){
+        elements.forEach(function(element) {
+            var charts = window["my"+element.id];
+            charts.resize();
+        });
+    }
+});
+</script>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>文章作者:</span>
+                        <span>killer.silver</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>文章链接:</span>
+                        <span><a href="https://killersilver9527.github.io/2024/04/18/%E5%AE%9D%E5%AE%9D%E5%B7%B4%E5%A3%AB%E7%89%88%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">本文永久链接</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>许可:</span>
+                        <span>▲ 文章转载或借鉴，请注明作者并附上该文章链接<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▲ 文章内原创资源若需使用，请注明作者并附上该文章链接<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▲ 文章内原创资源若需二创，请发送<a href="mailto:killersilver@qq.com">邮件</a>告知并获得许可</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>特别感谢:</span>
+                         <span>欢迎转载文章，若文章有错漏之处，望朋友们不吝赐教，请<a href="mailto:killersilver@qq.com">邮件</a>我</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>标签:</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%BD%91%E9%A1%B5%E5%89%8D%E7%AB%AF/"># 网页前端</a>
+                    
+                        <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"># 学习记录</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">返回</a>
+                <span>· </span>
+                <a href="/">首页</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© k.s | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    </div>
+</body>
+
+</html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cn">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
@@ -7,13 +7,13 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <meta name="author" content="k.s">
+    <meta name="author" content="killer.silver">
 
 
 
 
 
-<title>Archives | Hexo</title>
+<title>归档 | 𝓗𝓪𝓿𝓮 𝓪 𝓑𝓻𝓮𝓪𝓴</title>
 
 
 
@@ -44,6 +44,8 @@
     
 
 
+    <script type="text/javascript" src="/js/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" src="/js/sketch.min.js"></script>
 <meta name="generator" content="Hexo 7.1.1"></head>
 
 <body>
@@ -114,8 +116,159 @@
         n(),
         r()
 } (window, document);
+
     </script>
 
+<script>
+    // ----------------------------------------
+		// Particle
+		// ----------------------------------------
+
+		function Particle(x, y, radius) {
+			this.init(x, y, radius);
+		}
+
+		Particle.prototype = {
+
+			init : function(x, y, radius) {
+
+				this.alive = true;
+
+				this.radius = radius || 10;
+				this.wander = 0.15;
+				this.theta = random(TWO_PI);
+				this.drag = 0.92;
+				this.color = '#fff';
+
+				this.x = x || 0.0;
+				this.y = y || 0.0;
+
+				this.vx = 0.0;
+				this.vy = 0.0;
+			},
+
+			move : function() {
+
+				this.x += this.vx;
+				this.y += this.vy;
+
+				this.vx *= this.drag;
+				this.vy *= this.drag;
+
+				this.theta += random(-0.5, 0.5) * this.wander;
+				this.vx += sin(this.theta) * 0.1;
+				this.vy += cos(this.theta) * 0.1;
+
+				this.radius *= 0.96;
+				this.alive = this.radius > 0.5;
+			},
+
+			draw : function(ctx) {
+
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
+				ctx.fillStyle = this.color;
+				ctx.fill();
+			}
+		};
+
+		// ----------------------------------------
+		// Example
+		// ----------------------------------------
+
+		var MAX_PARTICLES = 100;
+		var COLOURS = [ '#69D2E7', '#A7DBD8', '#E0E4CC', '#F38630', '#FA6900',
+				'#FF4E50', '#F9D423' ];
+
+		var particles = [];
+		var pool = [];
+		var demo = Sketch.create({
+			container : document.getElementsByTagName("body")[0]
+		});
+
+		demo.setup = function() {
+
+			// Set off some initial particles.
+			var i, x, y;
+
+			//  for ( i = 0; i < 20; i++ ) {
+			x = (demo.width * 0.5) + random(-100, 100);
+			y = (demo.height * 0.5) + random(-100, 100);
+			demo.spawn(0, 999);
+			// }
+		};
+
+		demo.spawn = function(x, y) {
+
+			if (particles.length >= MAX_PARTICLES)
+				pool.push(particles.shift());
+
+			particle = pool.length ? pool.pop() : new Particle();
+			particle.init(x, y, random(5, 20));
+
+			particle.wander = random(0.5, 2.0);
+			particle.color = random(COLOURS);
+			particle.drag = random(0.9, 0.99);
+
+			theta = random(TWO_PI);
+			force = random(2, 8);
+
+			particle.vx = sin(theta) * force;
+			particle.vy = cos(theta) * force;
+
+			particles.push(particle);
+		};
+
+		demo.update = function() {
+
+			var i, particle;
+
+			for (i = particles.length - 1; i >= 0; i--) {
+
+				particle = particles[i];
+
+				if (particle.alive)
+					particle.move();
+				else
+					pool.push(particles.splice(i, 1)[0]);
+			}
+		};
+
+		demo.draw = function() {
+
+			demo.globalCompositeOperation = 'lighter';
+
+			for ( var i = particles.length - 1; i >= 0; i--) {
+				particles[i].draw(demo);
+			}
+		};
+
+		demo.mousemove = function() {
+
+			var particle, theta, force, touch, max, i, j, n;
+
+			for (i = 0, n = demo.touches.length; i < n; i++) {
+
+				touch = demo.touches[i], max = random(1, 4);
+				for (j = 0; j < max; j++) {
+					demo.spawn(touch.x, touch.y);
+				}
+
+			}
+		};
+</script>
+<script>
+	document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener('copy', (e) => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+		var copyrightStr = "\n\n\n-------------------------------------------------\nhey朋友，欢迎转载我的文章~\n转载文章请注明出处：killersilver9527.github.io\n版权所有© 2024 killer.silver，保留所有权利\n-------------------------------------------------"
+      e.clipboardData.setData('text/plain', selection.toString() + copyrightStr);
+      e.preventDefault();
+    }
+  });
+});
+</script>
     <div class="wrapper">
         <header>
     <nav class="navbar">
@@ -125,7 +278,7 @@
                 
                     <a class="menu-item" href="/">首页</a>
                 
-                    <a class="menu-item" href="/archives">文章</a>
+                    <a class="menu-item" href="/archives">归档</a>
                 
                     <a class="menu-item" href="/category">目录</a>
                 
@@ -154,7 +307,7 @@
                 
                     <a class="menu-item" href="/">首页</a>
                 
-                    <a class="menu-item" href="/archives">文章</a>
+                    <a class="menu-item" href="/archives">归档</a>
                 
                     <a class="menu-item" href="/category">目录</a>
                 
@@ -193,8 +346,8 @@
         
 
         <article class="archive-item">
-            <a class="archive-item-link" href="/2024/04/14/hello-world/">Hello World</a>
-            <span class="archive-item-date">April 14, 2024</span>
+            <a class="archive-item-link" href="/2024/04/18/%E5%AE%9D%E5%AE%9D%E5%B7%B4%E5%A3%AB%E7%89%88%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">宝宝巴士版个人博客搭建</a>
+            <span class="archive-item-date">2024-04-18</span>
         </article>
     
     
@@ -205,6 +358,7 @@
         <span>© k.s | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
     </div>
 </footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
     </div>
 </body>

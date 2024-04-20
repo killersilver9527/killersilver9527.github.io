@@ -1,7 +1,17 @@
 .wrapper {
+  position: absolute;
+  top: 0px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  pointer-events: none;
+}
+canvas {
+  position: fixed;
+  bottom: 0;
+  overflow: hidden;
+  height: auto;
   width: 100%;
 }
 .navbar {
@@ -16,11 +26,13 @@
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
+  pointer-events: auto;
 }
 .main {
   flex-grow: 1;
   flex-shrink: 0;
   flex-basis: auto;
+  pointer-events: auto;
 }
 .container {
   padding-left: 1em;
@@ -32,4 +44,7 @@
   text-align: center;
   line-height: 4rem;
   padding-top: 2em;
+}
+.footer a {
+  pointer-events: auto;
 }
