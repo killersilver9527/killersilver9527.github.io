@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="killer.silver">
+
+
+
+
+
+<title>Category: 璇玑阁 | 𝓚𝓮𝓵𝓪𝓷 𝓛𝓪𝓷𝓭</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+    <script type="text/javascript" src="/js/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" src="/js/sketch.min.js"></script>
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <script>
+        // heart mouse effect
+        !function(e, t, a) {
+    function r() {
+        for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+        requestAnimationFrame(r)
+    }
+    function n() {
+        var t = "function" == typeof e.onclick && e.onclick;
+        e.onclick = function(e) {
+            t && t(),
+                o(e)
+        }
+    }
+    function o(e) {
+        var a = t.createElement("div");
+        a.className = "heart",
+            s.push({
+                el: a,
+                x: e.clientX - 5,
+                y: e.clientY - 5,
+                scale: 1,
+                alpha: 1,
+                color: c()
+            }),
+            t.body.appendChild(a)
+    }
+    function i(e) {
+        var a = t.createElement("style");
+        a.type = "text/css";
+        try {
+            a.appendChild(t.createTextNode(e))
+        } catch(t) {
+            a.styleSheet.cssText = e
+        }
+        t.getElementsByTagName("head")[0].appendChild(a)
+    }
+    function c() {
+        return "rgb(" + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + ")"
+    }
+    var s = [];
+    e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame ||
+        function(e) {
+            setTimeout(e, 1e3 / 60)
+        },
+        i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"),
+        n(),
+        r()
+} (window, document);
+
+    </script>
+
+<script>
+    // ----------------------------------------
+		// Particle
+		// ----------------------------------------
+
+		function Particle(x, y, radius) {
+			this.init(x, y, radius);
+		}
+
+		Particle.prototype = {
+
+			init : function(x, y, radius) {
+
+				this.alive = true;
+
+				this.radius = radius || 10;
+				this.wander = 0.15;
+				this.theta = random(TWO_PI);
+				this.drag = 0.92;
+				this.color = '#fff';
+
+				this.x = x || 0.0;
+				this.y = y || 0.0;
+
+				this.vx = 0.0;
+				this.vy = 0.0;
+			},
+
+			move : function() {
+
+				this.x += this.vx;
+				this.y += this.vy;
+
+				this.vx *= this.drag;
+				this.vy *= this.drag;
+
+				this.theta += random(-0.5, 0.5) * this.wander;
+				this.vx += sin(this.theta) * 0.1;
+				this.vy += cos(this.theta) * 0.1;
+
+				this.radius *= 0.96;
+				this.alive = this.radius > 0.5;
+			},
+
+			draw : function(ctx) {
+
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
+				ctx.fillStyle = this.color;
+				ctx.fill();
+			}
+		};
+
+		// ----------------------------------------
+		// Example
+		// ----------------------------------------
+
+		var MAX_PARTICLES = 100;
+		var COLOURS = [ '#69D2E7', '#A7DBD8', '#E0E4CC', '#F38630', '#FA6900',
+				'#FF4E50', '#F9D423' ];
+
+		var particles = [];
+		var pool = [];
+		var demo = Sketch.create({
+			container : document.getElementsByTagName("body")[0]
+		});
+
+		demo.setup = function() {
+
+			// Set off some initial particles.
+			var i, x, y;
+
+			//  for ( i = 0; i < 20; i++ ) {
+			x = (demo.width * 0.5) + random(-100, 100);
+			y = (demo.height * 0.5) + random(-100, 100);
+			demo.spawn(0, 999);
+			// }
+		};
+
+		demo.spawn = function(x, y) {
+
+			if (particles.length >= MAX_PARTICLES)
+				pool.push(particles.shift());
+
+			particle = pool.length ? pool.pop() : new Particle();
+			particle.init(x, y, random(5, 20));
+
+			particle.wander = random(0.5, 2.0);
+			particle.color = random(COLOURS);
+			particle.drag = random(0.9, 0.99);
+
+			theta = random(TWO_PI);
+			force = random(2, 8);
+
+			particle.vx = sin(theta) * force;
+			particle.vy = cos(theta) * force;
+
+			particles.push(particle);
+		};
+
+		demo.update = function() {
+
+			var i, particle;
+
+			for (i = particles.length - 1; i >= 0; i--) {
+
+				particle = particles[i];
+
+				if (particle.alive)
+					particle.move();
+				else
+					pool.push(particles.splice(i, 1)[0]);
+			}
+		};
+
+		demo.draw = function() {
+
+			demo.globalCompositeOperation = 'lighter';
+
+			for ( var i = particles.length - 1; i >= 0; i--) {
+				particles[i].draw(demo);
+			}
+		};
+
+		demo.mousemove = function() {
+
+			var particle, theta, force, touch, max, i, j, n;
+
+			for (i = 0, n = demo.touches.length; i < n; i++) {
+
+				touch = demo.touches[i], max = random(1, 4);
+				for (j = 0; j < max; j++) {
+					demo.spawn(touch.x, touch.y);
+				}
+
+			}
+		};
+</script>
+<script>
+	document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener('copy', (e) => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+		var copyrightStr = "\n\n\n-------------------------------------------------\nhey朋友，欢迎转载我的文章~\n转载文章请注明出处：killersilver9527.github.io\n版权所有© 2024 killer.silver，保留所有权利\n-------------------------------------------------"
+      e.clipboardData.setData('text/plain', selection.toString() + copyrightStr);
+      e.preventDefault();
+    }
+  });
+});
+</script>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/"></a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/">首页</a>
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">目录</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                    <a class="menu-item" href="/friend">友链</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/"></a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/">首页</a>
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">目录</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                    <a class="menu-item" href="/friend">友链</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                
+
+
+    
+<div class="container">
+    <div class="post-wrap categories">
+        <h2 class="post-title">-&nbsp;目录&nbsp;·&nbsp;璇玑阁-</h2>
+    </div>
+    <div class="post-wrap archive">
+    
+    
+        
+
+        
+            <h3>2024</h3>
+        
+
+        <article class="archive-item">
+            <a class="archive-item-link" href="/2024/04/18/%E5%AE%9D%E5%AE%9D%E5%B7%B4%E5%A3%AB%E7%89%88%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">宝宝巴士版个人博客搭建</a>
+            <span class="archive-item-date">2024-04-18</span>
+        </article>
+    
+    
+</div>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© k.s | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    </div>
+</body>
+
+</html>

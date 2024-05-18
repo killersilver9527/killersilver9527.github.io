@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="killer.silver">
+
+
+
+
+
+<title>简明版色彩理论 | 𝓚𝓮𝓵𝓪𝓷 𝓛𝓪𝓷𝓭</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+    <script type="text/javascript" src="/js/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" src="/js/sketch.min.js"></script>
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <script>
+        // heart mouse effect
+        !function(e, t, a) {
+    function r() {
+        for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+        requestAnimationFrame(r)
+    }
+    function n() {
+        var t = "function" == typeof e.onclick && e.onclick;
+        e.onclick = function(e) {
+            t && t(),
+                o(e)
+        }
+    }
+    function o(e) {
+        var a = t.createElement("div");
+        a.className = "heart",
+            s.push({
+                el: a,
+                x: e.clientX - 5,
+                y: e.clientY - 5,
+                scale: 1,
+                alpha: 1,
+                color: c()
+            }),
+            t.body.appendChild(a)
+    }
+    function i(e) {
+        var a = t.createElement("style");
+        a.type = "text/css";
+        try {
+            a.appendChild(t.createTextNode(e))
+        } catch(t) {
+            a.styleSheet.cssText = e
+        }
+        t.getElementsByTagName("head")[0].appendChild(a)
+    }
+    function c() {
+        return "rgb(" + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + ")"
+    }
+    var s = [];
+    e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame ||
+        function(e) {
+            setTimeout(e, 1e3 / 60)
+        },
+        i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"),
+        n(),
+        r()
+} (window, document);
+
+    </script>
+
+<script>
+    // ----------------------------------------
+		// Particle
+		// ----------------------------------------
+
+		function Particle(x, y, radius) {
+			this.init(x, y, radius);
+		}
+
+		Particle.prototype = {
+
+			init : function(x, y, radius) {
+
+				this.alive = true;
+
+				this.radius = radius || 10;
+				this.wander = 0.15;
+				this.theta = random(TWO_PI);
+				this.drag = 0.92;
+				this.color = '#fff';
+
+				this.x = x || 0.0;
+				this.y = y || 0.0;
+
+				this.vx = 0.0;
+				this.vy = 0.0;
+			},
+
+			move : function() {
+
+				this.x += this.vx;
+				this.y += this.vy;
+
+				this.vx *= this.drag;
+				this.vy *= this.drag;
+
+				this.theta += random(-0.5, 0.5) * this.wander;
+				this.vx += sin(this.theta) * 0.1;
+				this.vy += cos(this.theta) * 0.1;
+
+				this.radius *= 0.96;
+				this.alive = this.radius > 0.5;
+			},
+
+			draw : function(ctx) {
+
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
+				ctx.fillStyle = this.color;
+				ctx.fill();
+			}
+		};
+
+		// ----------------------------------------
+		// Example
+		// ----------------------------------------
+
+		var MAX_PARTICLES = 100;
+		var COLOURS = [ '#69D2E7', '#A7DBD8', '#E0E4CC', '#F38630', '#FA6900',
+				'#FF4E50', '#F9D423' ];
+
+		var particles = [];
+		var pool = [];
+		var demo = Sketch.create({
+			container : document.getElementsByTagName("body")[0]
+		});
+
+		demo.setup = function() {
+
+			// Set off some initial particles.
+			var i, x, y;
+
+			//  for ( i = 0; i < 20; i++ ) {
+			x = (demo.width * 0.5) + random(-100, 100);
+			y = (demo.height * 0.5) + random(-100, 100);
+			demo.spawn(0, 999);
+			// }
+		};
+
+		demo.spawn = function(x, y) {
+
+			if (particles.length >= MAX_PARTICLES)
+				pool.push(particles.shift());
+
+			particle = pool.length ? pool.pop() : new Particle();
+			particle.init(x, y, random(5, 20));
+
+			particle.wander = random(0.5, 2.0);
+			particle.color = random(COLOURS);
+			particle.drag = random(0.9, 0.99);
+
+			theta = random(TWO_PI);
+			force = random(2, 8);
+
+			particle.vx = sin(theta) * force;
+			particle.vy = cos(theta) * force;
+
+			particles.push(particle);
+		};
+
+		demo.update = function() {
+
+			var i, particle;
+
+			for (i = particles.length - 1; i >= 0; i--) {
+
+				particle = particles[i];
+
+				if (particle.alive)
+					particle.move();
+				else
+					pool.push(particles.splice(i, 1)[0]);
+			}
+		};
+
+		demo.draw = function() {
+
+			demo.globalCompositeOperation = 'lighter';
+
+			for ( var i = particles.length - 1; i >= 0; i--) {
+				particles[i].draw(demo);
+			}
+		};
+
+		demo.mousemove = function() {
+
+			var particle, theta, force, touch, max, i, j, n;
+
+			for (i = 0, n = demo.touches.length; i < n; i++) {
+
+				touch = demo.touches[i], max = random(1, 4);
+				for (j = 0; j < max; j++) {
+					demo.spawn(touch.x, touch.y);
+				}
+
+			}
+		};
+</script>
+<script>
+	document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener('copy', (e) => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+		var copyrightStr = "\n\n\n-------------------------------------------------\nhey朋友，欢迎转载我的文章~\n转载文章请注明出处：killersilver9527.github.io\n版权所有© 2024 killer.silver，保留所有权利\n-------------------------------------------------"
+      e.clipboardData.setData('text/plain', selection.toString() + copyrightStr);
+      e.preventDefault();
+    }
+  });
+});
+</script>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/"></a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/">首页</a>
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">目录</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                    <a class="menu-item" href="/friend">友链</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/"></a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/">首页</a>
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">目录</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                    <a class="menu-item" href="/friend">友链</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">◕‿◕ 展开</a>
+        <a onclick="go_top()">▲ 去到顶部</a>
+        <!-- <a onclick="go_bottom()">▼ 去到底部</a> -->
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "-‿- 折叠"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "◕‿◕ 展开"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">简明版色彩理论</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        <!-- Date: <a href="#">2024-05-18&nbsp;&nbsp;13:45:34</a> -->
+                        发布时间: <a href="#">2024-05-18&nbsp;&nbsp;</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    文章目录:
+                            
+                                <a href="/categories/%E6%98%9F%E8%BE%B0%E4%B8%87%E8%B1%A1/">星辰万象</a>
+                            
+                                <a href="/categories/%E6%98%9F%E8%BE%B0%E4%B8%87%E8%B1%A1/%E4%B8%B9%E9%9D%92%E5%9D%8A/">丹青坊</a>
+                            
+                        </span>
+                    
+
+                    
+                        <span class="post-time">
+                        <br>文章总字数: 2.6k&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
+                        <span class="post-time">
+                            建议阅读时长: 10min&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
+                    
+
+                    
+                        <span id="busuanzi_container_page_pv">
+                        文章阅读量: <span id="busuanzi_value_page_pv"></span>&nbsp;&nbsp;
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <audio controls autoplay loop>
+  <source src="/image/posts/post2/extend/JABBERLOOP-Orange.mp3" type="audio/mpeg">
+</audio>
+
+<p>作为一个设计爱好者，但确实是业余人士，一直处于又菜又爱玩的状态，基本都靠感觉行事</p>
+<p>但最近有看了一些简单的色彩理论，特地在此记录一番，方便未来有需要随时查看</p>
+<h2 id="色轮"><a href="#色轮" class="headerlink" title="色轮"></a>色轮</h2><p>这里记录的色轮均由12种基本颜色组成<sup><a id="link1" href="#ref1">-1-</a></sup></p>
+<p>根据不同类型的色轮，存在不同的三原色，之后根据原色混合产生间色，再由间色混合产出复色</p>
+<p>不同的色轮由不同的人发明，他们对于色彩的见解不一样，因此创建出来的色轮用途也不一样</p>
+<p><strong>伊顿色轮</strong></p>
+<p>伊顿色轮又被称之为美术三原色，是由近代瑞士色彩学大师约翰内斯·伊顿设计</p>
+<p>其特点是由颜料的三原色混合叠加而成，也是现实生活中最适合用于选择设计色彩的色轮</p>
+<img class="guide_img" src="/image/posts/post2/1.png" alt="伊顿色轮" width=95%>
+
+<p><strong>RGB色轮</strong></p>
+<p>RGB色轮的三原色是光的三原色</p>
+<p>所以该色轮主要运用于电脑、手机、平板等一系列科技产品，是网络显示中最常用的色轮</p>
+<img class="guide_img" src="/image/posts/post2/2.png" alt="RGB色轮" width=95%>
+
+<p><strong>CMYK色轮</strong></p>
+<p>只要在屏幕上显示的图像，就是RGB模式表现的</p>
+<p>但只要是在印刷品上看到的图像，就是CMYK模式表现的</p>
+<p>比如杂志、图书插画等，都是印刷出来的，使用的就都是CMYK色轮</p>
+<img class="guide_img" src="/image/posts/post2/3.png" alt="CMYK色轮" width=95%>
+
+<h2 id="色彩三要素"><a href="#色彩三要素" class="headerlink" title="色彩三要素"></a>色彩三要素</h2><p><strong>HSV</strong></p>
+<p>HSV也可称为HSB，Hue 色相、Saturation 饱和度、Brightness 明度</p>
+<img  src="/image/posts/post2/4.png" alt="hsv" width=60%>
+
+<p>Hue：色相，即颜色的名称，比如：红色、品红</p>
+<p>Saturation：饱和度，即颜色的纯度。在HSB中控制纯色中混入白色的量，值越大白色越少，则颜色越纯</p>
+<p>Brightness&#x2F;Value：明度，即颜色的明亮程度。在HSB中控制纯色中混入黑色的量，值越大黑色越少，则明度越高</p>
+<p><strong>HSL</strong></p>
+<p>Hue 色相、Saturation 饱和度、Lightness 明度</p>
+<img  src="/image/posts/post2/5.png" alt="hsv" width=60%>
+
+<p>Hue：色相，即颜色的名称，比如：红色、品红</p>
+<p>Saturation：饱和度，即颜色的纯度。在HSL中和黑白无关，饱和度不控制颜色中混入黑白的多寡</p>
+<p>Lightness：明度，即颜色的明亮程度。在HSL中控制纯色中混入的黑白两种颜色</p>
+<h2 id="色彩含义"><a href="#色彩含义" class="headerlink" title="色彩含义"></a>色彩含义</h2><p>色彩分为冷色和暖色，以及中性色</p>
+<img class="guide_img" src="/image/posts/post2/12.png" alt="hsv" width=30%>
+
+<p>暖色通常象征暖的、热情的、有活力的</p>
+<p>冷色通常象征冷的、冷静的、专业性的</p>
+<p>中性色的含义通常更容易受到周围环境的影响<sup><a id="link2" href="#ref2">-2-</a></sup></p>
+<p><strong>暖色-红</strong></p>
+<img  src="/image/posts/post2/13.png" alt="hsv" width=50%>
+
+<p>红色的象征：暴力、战争、危险、愤怒、激情、爱、重要性、繁荣好运（中国）</p>
+<p>红色是一种强调色，明亮的红具有活力，深色的红则更显优雅</p>
+<p><strong>暖色-橙</strong></p>
+<img  src="/image/posts/post2/14.png" alt="hsv" width=50%>
+
+<p>橙色的象征：有活力、创造力、秋天、变化和运动</p>
+<p>橙色通常与健康活力相联系，吸引眼球的同时不会像红色一样引人注目</p>
+<p><strong>暖色-黄</strong></p>
+<img  src="/image/posts/post2/15.png" alt="hsv" width=50%>
+
+<p>黄色的象征：幸福、希望、快乐、危险、懦弱、欺骗</p>
+<p>亮黄色通常给人幸福快乐的感觉，淡黄色则是给人一种平静的幸福感，暗黄和金黄则常用于显示古典优雅</p>
+<p><strong>冷色-绿</strong></p>
+<img  src="/image/posts/post2/16.png" alt="hsv" width=50%>
+
+<p>绿色的象征：成长、更新、富足、稳定、自然、嫉妒</p>
+<p>绿色通常起到平衡和协调的作用，明亮的绿色具有活力，橄榄绿更能代表自然，深绿是最稳定的，也是富裕的代表</p>
+<p><strong>冷色-蓝</strong></p>
+<img  src="/image/posts/post2/17.png" alt="hsv" width=50%>
+
+<p>蓝色的象征：悲伤、冷静、可靠、责任感、和平</p>
+<p>浅蓝色通常是放松和平静的，明亮的蓝色让人精神抖擞，深蓝色则通常给人感觉很可靠</p>
+<p><strong>冷色-紫</strong></p>
+<img  src="/image/posts/post2/18.png" alt="hsv" width=50%>
+
+<p>紫色的象征：创造力、想象力、富裕、财富、浪漫</p>
+<p>深紫色给人一种财富和奢华之感，淡紫色则更柔和，通常与春天和浪漫联系在一起</p>
+<p><strong>中性-黑</strong></p>
+<img  src="/image/posts/post2/19.png" alt="hsv" width=50%>
+
+<p>黑色的象征：权力、优雅、正式、邪恶、死亡、神秘</p>
+<p>黑色通常用于排版和各种功能部件，通常可以使得设计有高级感和神秘感</p>
+<p><strong>中性-白</strong></p>
+<img  src="/image/posts/post2/20.png" alt="hsv" width=50%>
+
+<p>白色的象征：纯洁、干净、美德、善良</p>
+<p>白色通常是中性背景色，帮助传达出干净与简单，通常用于极简主义设计</p>
+<p><strong>中性-灰</strong></p>
+<img  src="/image/posts/post2/21.png" alt="hsv" width=50%>
+
+<p>灰色的象征：情绪化、沮丧、正式、专业、保守、拘谨</p>
+<p>灰色在设计中很常见，通常可以用浅灰色代替纯白，用深灰色代替纯黑</p>
+<p><strong>中性-棕</strong></p>
+<img  src="/image/posts/post2/22.png" alt="hsv" width=50%>
+
+<p>棕色的象征：自然、温暖、泥土、可靠、坚定、枯燥</p>
+<p>棕色常用于背景色，主要出现在木材、石头纹理中，通常给人一种温暖健康的感觉</p>
+<p>有时会以其最暗形式代替黑色</p>
+<p><strong>中性-褐</strong></p>
+<img  src="/image/posts/post2/23.png" alt="hsv" width=50%>
+
+<p>褐色的象征：保守、虔诚、沉闷</p>
+<p>褐色，或称为米褐色，保有棕色的温暖以及白色的凉爽，通常用于背景和纸张纹理中</p>
+<p><strong>中性-米</strong></p>
+<img  src="/image/posts/post2/24.png" alt="hsv" width=50%>
+
+<p>米色的象征：平静、优雅、纯净、历史感</p>
+<p>米色，或称为象牙白，通常带有优雅平静的感觉，与棕色等泥土色结合有泥土质感，也可用于淡化较暗的颜色</p>
+<h2 id="基础配色方案"><a href="#基础配色方案" class="headerlink" title="基础配色方案"></a>基础配色方案</h2><p>配色方案来自<sup><a id="link3" href="#ref3">-3-</a></sup>和<sup><a id="link4" href="#ref4">-4-</a></sup></p>
+<p><strong>同一色方案</strong></p>
+<p>同一色方案也称为单色方案，该方案只使用一种颜色创建</p>
+<p>选取的规则类似选取纯色渐变，使用色轮上相同角度的不同色即可</p>
+<img class="guide_img" src="/image/posts/post2/6.png" alt="同一色" width=60%>
+
+<p><strong>相邻色方案</strong></p>
+<p>相邻色方案也称为类似色方案，该方案使用色轮上彼此相邻的颜色创建</p>
+<p>通常这些颜色搭配起来都很好看，是一种带给人平静、舒服的设计</p>
+<img class="guide_img" src="/image/posts/post2/7.png" alt="相邻色" width=60%>
+
+<p><strong>互补色方案</strong></p>
+<p>互补色即色轮相对侧的颜色，该方案使用一组互补色创建</p>
+<p>强烈对比营造出一种生机活力，特别是在饱和状态下使用</p>
+<p>使用这种色系要控制好，否则会显得太突兀</p>
+<img class="guide_img" src="/image/posts/post2/8.png" alt="互补色" width=60%>
+
+<p><strong>三角色方案</strong></p>
+<p>三角色方案也称为三元方案、三色方案，该方案使用围绕色轮等距分布的色调创建</p>
+<p>三色系是指在色轮中平均分布，可连成三角形的色彩</p>
+<p>要成功地使用三色系产生和谐效果，需要谨慎地在色彩间取得平衡：</p>
+<p>只用一种作为主色，其他两种颜色用作烘托</p>
+<img class="guide_img" src="/image/posts/post2/9.png" alt="三角色" width=60%>
+
+<p><strong>矩形色方案</strong></p>
+<p>矩形色系或者四色系是指由两对互补色组成的颜色，该方案使用两组互补色创建</p>
+<p>使用四色系的时候，选定一种作为主色，其他作为辅助，效果最佳</p>
+<img class="guide_img" src="/image/posts/post2/10.png" alt="矩形色" width=60%>
+
+<p><strong>复合色方案</strong></p>
+<p>复合色方案也称为拆分互补方案，与互补色方案几乎相同</p>
+<p>但该方案不使用相反的颜色，而是使用相反色调联两侧的颜色</p>
+<img class="guide_img" src="/image/posts/post2/11.png" alt="复合色" width=60%>
+
+<h2 id="经典色系"><a href="#经典色系" class="headerlink" title="经典色系"></a>经典色系</h2><p>这里列举一些经典色系，以及经典颜色</p>
+<p><strong>洛可可色系</strong></p>
+<img src="/image/posts/post2/25.png" alt="洛可可" width=80%>
+
+<p><strong>蒙德里安色系</strong></p>
+<img src="/image/posts/post2/26.png" alt="蒙德里安" width=80%>
+
+<p><strong>马卡龙色系</strong></p>
+<img src="/image/posts/post2/27.png" alt="马卡龙" width=80%>
+
+<p><strong>孟菲斯色系</strong></p>
+<img src="/image/posts/post2/28.png" alt="孟菲斯" width=80%>
+
+<p><strong>莫兰迪色系</strong></p>
+<img src="/image/posts/post2/29.png" alt="莫兰迪" width=80%>
+
+<p><strong>敦煌色系</strong></p>
+<img src="/image/posts/post2/30.png" alt="敦煌" width=80%>
+
+<p><strong>马蒂斯色系</strong></p>
+<img src="/image/posts/post2/31.png" alt="马蒂斯" width=80%>
+
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a id="ref1" href="#link1">[1]</a> 色彩理论：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/63563651">https://zhuanlan.zhihu.com/p/63563651</a></p>
+<p><a id="ref2" href="#link2">[2]</a> 色彩理论：<a target="_blank" rel="noopener" href="https://www.smashingmagazine.com/2010/01/color-theory-for-designers-part-1-the-meaning-of-color/">https://www.smashingmagazine.com/2010/01/color-theory-for-designers-part-1-the-meaning-of-color/</a></p>
+<p><a id="ref3" href="#link3">[3]</a> 配色方案：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/787cc72c0a6a">https://www.jianshu.com/p/787cc72c0a6a</a></p>
+<p><a id="ref4" href="#link4">[4]</a> 配色方案：<a target="_blank" rel="noopener" href="https://www.w3ccoo.com/colors/colors_schemes.html">https://www.w3ccoo.com/colors/colors_schemes.html</a></p>
+<p>[5] 推荐-中国色：<a target="_blank" rel="noopener" href="https://www.zhongguose.com/">https://www.zhongguose.com/</a></p>
+<p>[6] 推荐-LOL Colors：<a target="_blank" rel="noopener" href="https://www.webdesignrankings.com/resources/lolcolors/">https://www.webdesignrankings.com/resources/lolcolors/</a></p>
+<h2 id="配色推荐"><a href="#配色推荐" class="headerlink" title="配色推荐"></a>配色推荐</h2><p>四色配色推荐，点击对应配色组，可改变侧边图形颜色</p>
+<div class="color-container">
+<div id="color-svgcontainer" class="color-svgcontainer"></div>
+<div class="color-img1">
+    <img id="pic1" class="color-picleft" src="/image/posts/post2/color1_left.png">
+</div>
+<div class="color-img2">
+    <img id="pic2" class="color-picleft" src="/image/posts/post2/color2_left.png">
+</div>
+<div class="color-img3">
+    <img id="pic3" class="color-picleft" src="/image/posts/post2/color3_left.png">
+</div>
+<div class="color-img4">
+    <img id="pic4" class="color-picleft" src="/image/posts/post2/color4_left.png">
+</div>
+<div class="color-img5">
+    <img id="pic5" class="color-picleft" src="/image/posts/post2/colorb_left.png">
+</div>
+<div class="color-img6">
+    <img id="pic6" class="color-picright" src="/image/posts/post2/color1_right.png">
+</div>
+<div class="color-img7">
+    <img id="pic7" class="color-picright" src="/image/posts/post2/color2_right.png">
+</div>
+<div class="color-img8">
+    <img id="pic8" class="color-picright" src="/image/posts/post2/color3_right.png">
+</div>
+<div class="color-img9">
+    <img id="pic9" class="color-picright" src="/image/posts/post2/color4_right.png">
+</div>
+<div class="color-img10">
+    <img id="pic10" class="color-picright" src="/image/posts/post2/colorb_right.png">
+</div>
+</div>
+
+<style>
+    audio::-webkit-media-controls-enclosure{
+        background-color: transparent;
+    }
+    audio::-webkit-media-controls-panel{
+        background-image: url("/image/posts/post2/extend/audioplayer.gif");
+        background-color: white;
+    }
+    .guide_img {
+        border: 3px dashed #96d9d8;
+        border-radius: 10px;
+    }
+    .color-container{
+        position: relative;
+        display:flex;
+        flex-direction: column;
+    }
+    .color-svgcontainer{
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        justify-content:center;
+    }
+    .color-img1{
+        vertixal-align: top;
+        position:absolute;
+        width: 164px;
+        height: 512px;
+        text-indent:-164px;
+        overflow:hidden;
+        top:100px;
+        z-index:-10;
+    }
+    .color-img1 img{
+        display:inline;
+    }
+    .color-img2{
+        position:absolute;
+        width: 164px;
+        height: 512px;
+        text-indent:-164px;
+        overflow:hidden;
+        top:100px;
+        z-index:-11;
+    }
+    .color-img2 img{
+        display:inline;
+    }
+    .color-img3{
+        position:absolute;
+        width: 164px;
+        height: 512px;
+        text-indent:-164px;
+        overflow:hidden;
+        top: 100px;
+        z-index:-12;
+    }
+    .color-img3 img{
+        display:inline;
+    }
+    .color-img4{
+        position:absolute;
+        width: 164px;
+        height: 512px;
+        text-indent:-164px;
+        overflow:hidden;
+        top: 100px;
+        z-index:-13;
+    }
+    .color-img4 img{
+        display:inline;
+    }
+    .color-img5{
+        position:absolute;
+        width: 164px;
+        height: 512px;
+        text-indent:-164px;
+        overflow:hidden;
+        top: 100px;
+        z-index:-9;
+    }
+    .color-img6{
+        position:absolute;
+        width: 151px;
+        height: 419px;
+        text-indent:-151px;
+        overflow:hidden;
+        bottom: 100px;
+        right: 0;
+        z-index:-10;
+    }
+    .color-img6 img{
+        display:inline;
+    }
+    .color-img7{
+        position:absolute;
+        width: 151px;
+        height: 419px;
+        text-indent:-151px;
+        overflow:hidden;
+        bottom: 100px;
+        right: 0;
+        z-index:-11;
+    }
+    .color-img7 img{
+        display:inline;
+    }
+    .color-img8{
+        position:absolute;
+        width: 151px;
+        height: 419px;
+        text-indent:-151px;
+        overflow:hidden;
+        bottom: 100px;
+        right: 0;
+        z-index:-12;
+    }
+    .color-img8 img{
+        display:inline;
+    }
+    .color-img9{
+        position:absolute;
+        width: 151px;
+        height: 419px;
+        text-indent: -151px;
+        overflow:hidden;
+        bottom: 100px;
+        right: 0;
+        z-index:-13;
+    }
+    .color-img9 img{
+        display:inline;
+    }
+    .color-img10{
+        position:absolute;
+        width: 151px;
+        height: 419px;
+        text-indent:-151px;
+        overflow:hidden;
+        bottom: 100px;
+        right: 0;
+        z-index:-9;
+    }
+    .color-picleft{
+        width:164px;
+        height:512px;
+        filter: drop-shadow(164px 0px #E0DFDE);
+    }
+    .color-picright{
+        width:151px;
+        height:419px;
+        filter: drop-shadow(151px 0px #E0DFDE);
+    }
+</style>
+
+<script>
+    var colors_Chosen = [["#9DC8C8","#58C9B9","#519D9E","#D1B6E1"],
+  ["#A593E0","#E0E3DA","#FFFFF3","#566270"],["#D7FFF1","#8CD790","#77AF9C","#285943"],
+  ["#FBFFB9","#FDD692","#EC7357","#754F44"],["#C5E99B","#8FBC94","#548687","#56445D"],
+  ["#67D5B5","#EE7785","#C89EC4","#84B1ED"],["#F16B6F","#C5C6B6","#AACD6E","#3C3530"],
+  ["#77AAAD","#6E7783","#D8E6E7","#9DC3C1"],["#D09E88","#FADAD8","#534847","#9B8281"],
+  ["#F0E5DE","#ABD0CE","#7C7877","#D9D4CF"],["#a5dff9","#ef5285","#60c5ba","#feee7d"],
+  ["#ede574","#f9d423","#fc913a","#ff4e50"],["#e94e77","#d68189","#c6a49a","#c6e5d9"],
+  ["#490a3d","#bd1550","#e97f02","#f8ca00"],["#fe4365","#fc9d9a","#f9cdad","#c8c8a9"],
+  ["#E984A2","#B9CC95","#F8D49B","#F8E6CB"],["#75BDE0","#F8D49B","#F8BC9B","#F89B9B"],
+  ["#3B7097","#75BDE0","#A9D09E","#F6E2BC"],["#7F58AF","#64C5EB","#E84DBA","#FEB326"],
+  ["#FFC93C","#07689F","#40A8C4","#A2D5F2"],["#355C7D","#725A7A","#C56C86","#FF7582"],
+  ["#C848B9","#F962A7","#FD836D","#FFBA69"],["#3D9A8B","#2EB19F","#63C2D2","#B7EDFF"],
+  ["#F3533A","#FA9F42","#8AD879","#5ACFC9"],["#49493C","#9FA180","#F2F77F","#6EBAA7"],
+  ["#FF4545","#FF9867","#FFBF87","#FFEDB2"],["#2D4059","#EA5455","#DECDC3","#E5E5E5"],
+  ["#CF5991","#FCB79D","#FEEEDA","#646BD9"],["#AE8D92","#F8F7F4","#E3D8D4","#BBA7A1"],
+  ["#E1B562","#EFD8CC","#BBBCAB","#F2EEED"],["#E9E4D4","#D1C7C5","#55587A","#C46D60"],
+  ["#364437","#C09C81","#C87247","#E2D5C6"],["#AF644E","#DADCD9","#9B9A6F","#EDE8DC"],
+  ["#A6BCAF","#F6C9AE","#F3E4CA","#0A4445"],["#EFB53F","#FAF5C5","#F2DCB3","#C5D0B9"],
+  ["#F08865","#041C3B","#AECCE3","#E0DFDE"]
+];
+    function Color_CreateHtml(container)
+    {
+        for(let i=0; i < colors_Chosen.length; i++)
+        {
+            var divcontain = document.createElement('div');
+            divcontain.style.width = "160px";
+            divcontain.style.height = "40px";
+            divcontain.style.margin = "10px";
+            divcontain.style.paddingTop = "10px";
+            divcontain.style.paddingBottom = "10px";
+            divcontain.style.paddingLeft = "50px";
+            divcontain.style.paddingRight = "50px";
+            divcontain.id = "Chosen_Color_" + i;
+            for(let j=0; j < colors_Chosen[i].length; j++)
+            {
+                var svgcontain = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svgcontain.setAttribute("width", "40");
+                svgcontain.setAttribute("height", "40");
+                var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", "20");
+                circle.setAttribute("cy", "20");
+                circle.setAttribute("r", "10");
+                circle.setAttribute("fill", colors_Chosen[i][j]);
+                svgcontain.appendChild(circle);
+                divcontain.appendChild(svgcontain);
+            }
+            container.appendChild(divcontain);
+        }
+    }
+    const container = document.getElementById("color-svgcontainer");
+    Color_CreateHtml(container);
+    var divsWithColor = document.querySelectorAll('div[id^="Chosen_Color_"]');
+divsWithColor.forEach(function(div){
+    div.addEventListener("click", function(){
+        let idnum = div.id.replace("Chosen_Color_", "");
+        document.getElementById("pic1").style.filter = "drop-shadow(164px 0px" + colors_Chosen[idnum][0] + ")";
+        document.getElementById("pic6").style.filter = "drop-shadow(151px 0px" + colors_Chosen[idnum][0] + ")";
+        document.getElementById("pic2").style.filter = "drop-shadow(164px 0px" + colors_Chosen[idnum][1] + ")";
+        document.getElementById("pic7").style.filter = "drop-shadow(151px 0px" + colors_Chosen[idnum][1] + ")";
+        document.getElementById("pic3").style.filter = "drop-shadow(164px 0px" + colors_Chosen[idnum][2] + ")";
+        document.getElementById("pic8").style.filter = "drop-shadow(151px 0px" + colors_Chosen[idnum][2] + ")";
+        document.getElementById("pic4").style.filter = "drop-shadow(164px 0px" + colors_Chosen[idnum][3] + ")";
+        document.getElementById("pic9").style.filter = "drop-shadow(151px 0px" + colors_Chosen[idnum][3] + ")";
+    });
+});</script>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>文章作者:</span>
+                        <span>killer.silver</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>文章链接:</span>
+                        <span><a href="https://killersilver9527.github.io/2024/05/18/%E7%AE%80%E6%98%8E%E7%89%88%E8%89%B2%E5%BD%A9%E7%90%86%E8%AE%BA/">本文永久链接</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>许可:</span>
+                        <span>▲ 文章转载或借鉴，请注明作者并附上该文章链接<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▲ 文章内原创资源若需使用，请注明作者并附上该文章链接<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▲ 文章内原创资源若需二创，请发送<a href="mailto:killersilver@qq.com">邮件</a>告知并获得许可</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>特别感谢:</span>
+                         <span>欢迎转载文章，若文章有错漏之处，望朋友们不吝赐教，请<a href="mailto:killersilver@qq.com">邮件</a>我</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>标签:</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"># 学习记录</a>
+                    
+                        <a href="/tags/%E8%AE%BE%E8%AE%A1/"># 设计</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">返回</a>
+                <span>· </span>
+                <a href="/">首页</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2024/04/18/%E5%AE%9D%E5%AE%9D%E5%B7%B4%E5%A3%AB%E7%89%88%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">宝宝巴士版个人博客搭建</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© k.s | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    </div>
+</body>
+
+</html>
